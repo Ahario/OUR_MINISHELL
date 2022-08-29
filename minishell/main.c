@@ -140,7 +140,6 @@ int	main(int argc, char *argv[], char **envp)
 	while(1)
 	{
 		ch = readline("MINISHELL./ ");
-//		sunglee_signal_here;
 		if (ch)
 			parse(ch, &data);
 		else if (!ch)
