@@ -1,4 +1,6 @@
- #include "minishell.h"
+ #include "libft/libft.h"
+#include "minishell.h"
+#include <stdlib.h>
 
 //t_arg *set_cmd(char *ch)
 //{
@@ -44,7 +46,7 @@ int add_back_1(t_arg *head, char *ch, char *charset)
 {
 	t_arg	*curr;
 	t_arg	*new;
-	int 		i;
+	int			i;
 	char		checking;
 
 	i = 0;
@@ -84,7 +86,7 @@ void add_back(t_arg *head, char *ch)
 	new->next = NULL;
 }
 
-void parse(char *ch, t_data *data)
+int	parse(char *ch, t_data *data)
 {
 	int			i;
 	t_arg	*head;
@@ -109,11 +111,16 @@ void parse(char *ch, t_data *data)
 		else if (ch[i] == '\"' || ch[i] == '\'')
 			i += (add_back_1(head, &ch[i], &ch[i]) + 1);
 	}
-	while(head->next != NULL) 
+/*	while(head->next != NULL)
 	{
 		head = head->next;
+		if (!exitcheck(head))
+			exit2();
 		printf("%s\n", head->ac);
-	}
+	}*/
+	head = head->next;
+	data->cmd = head;
+	return (1);
 }
 
 void before_init(void)
@@ -125,7 +132,17 @@ void before_init(void)
 	tcsetattr(STDIN_FILENO, TCSANOW, &change);
 }
 
-int	main(int argc, char *argv[], char **envp)  
+void	ft_start(t_data *data)
+{
+	t_arg *check;
+
+	data->cmd->type = 0;
+	check = data->cmd;
+	if (!(ft_strncmp(check->ac, "exit", 5)))
+		ft_exit(check);
+}
+
+int	main(int argc, char *argv[], char **envp)
 {
 	t_data			data;
 	struct termios	terminal;
@@ -140,11 +157,11 @@ int	main(int argc, char *argv[], char **envp)
 	while(1)
 	{
 		ch = readline("MINISHELL./ ");
-		if (ch)
-			parse(ch, &data);
-		else if (!ch)
-			ft_exit();
+		if (!ch)
+			exit_C_d();
 		add_history(ch);
+		if (parse(ch, &data))
+			ft_start(&data);
 		free(ch);
 	}
 	tcsetattr(STDIN_FILENO, TCSANOW, &terminal);

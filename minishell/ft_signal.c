@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/29 14:40:03 by sunglee           #+#    #+#             */
-/*   Updated: 2022/08/29 14:47:42 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/08/30 14:08:25 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,14 +19,6 @@ static void	ft_ctrl_c(int sig)
 	rl_replace_line("", 1);
 	rl_on_new_line();
 	rl_redisplay();
-}
-
-void	ft_exit(void)
-{
-	printf ("\033[1A");
-	printf ("\033[11C");
-	printf (" exit\n");
-	exit (EXIT_FAILURE);
 }
 
 void	ft_signal(void)

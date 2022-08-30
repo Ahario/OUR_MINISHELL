@@ -35,7 +35,12 @@ enum	e_pars{
 //t_arg	*set_cmd(char *ch);
 void	before_init(void);
 void	ft_signal(void);
-void	ft_exit(void);
+void	exit_C_d(void);
+
+//exit
+void	ft_exit(t_arg *head);
+int	exitcheck(t_arg *head);
+void	exit2(void);
 
 
 #endif

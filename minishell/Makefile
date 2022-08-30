@@ -1,5 +1,6 @@
 SRCS = main.c \
-	   ft_signal.c
+	   ft_signal.c\
+	   ft_exit.c
 LIBFT = -L ./libft -lft
 LIBSRCS = libft
 OBJS = ${SRCS:.c=.o}
