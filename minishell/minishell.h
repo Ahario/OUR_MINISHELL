@@ -41,6 +41,8 @@ void	exit_C_d(void);
 void	ft_exit(t_arg *head);
 int	exitcheck(t_arg *head);
 void	exit2(void);
-
+//env
+void	ft_env(char **envp);
+void	ft_export(t_data *data);
 
 #endif

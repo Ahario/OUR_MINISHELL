@@ -140,6 +140,10 @@ void	ft_start(t_data *data)
 	check = data->cmd;
 	if (!(ft_strncmp(check->ac, "exit", 5)))
 		ft_exit(check);
+	if (!(ft_strncmp(check->ac, "env", 4)))
+		ft_env(data->envp);
+	if (!(ft_strncmp(check->ac, "export", 6)))
+		ft_export(data);
 }
 
 int	main(int argc, char *argv[], char **envp)
