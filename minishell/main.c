@@ -30,90 +30,133 @@ int	check(char const str, char *charset)
 	return (0);
 }
 
+// int	if_char(char const *str, char *charset)
+// {
+// 	int	i;
+
+// 	i = 0;
+// 	while (str[i] != '\0' && !(check(str[i], charset)))
+// 		i++;
+// 	return (i);
+// }
+
 int	if_char(char const *str, char *charset)
 {
-	int	i;
+	int		i;
+	int	q_flag;
+	int	dq_flag;
 
+	q_flag = 0;
+	dq_flag = 0;
 	i = 0;
-	while (str[i] != '\0' && !(check(str[i], charset)))
+	(void)charset;
+	while(str[i] != '\0')
+	{
+		if ((str[i - 1] != '\\' && str[i] == '\"') || (str[i - 1] != '\\' && str[i] == '\''))
+		{
+			if (str[i] == '\"' && q_flag == 0)
+			{
+				if (dq_flag == 1)
+					dq_flag = 0;
+				else
+					dq_flag = 1;
+			}
+			else if (str[i] == '\'' && dq_flag == 0)
+			{
+				if (q_flag == 1)
+					q_flag = 0;
+				else
+					q_flag = 1;
+			}
+		}
+		if (q_flag == 0 && dq_flag == 0 && str[i] == ' ')
+			break;
 		i++;
+	}
 	return (i);
 }
 
-int add_back_1(t_arg *head, char *ch, char *charset)
+int add_back_1(t_arg **head, char *ch)
 {
 	t_arg	*curr;
 	t_arg	*new;
 	int 		i;
-	char		checking;
 
 	i = 0;
-	checking = charset[0];
-	curr = head;
-	new = malloc(sizeof(t_arg) * 1);
+	curr = *head;
 	while (ch[i] != '\0')
 	{
 		i++;
-		if ((ch[i] == checking && ch[i - 1] != '\\'))
+		if ((ch[i] == ch[0] && ch[i - 1] != '\\'))
 		{
 			i++;
 			break;
 		}
 	}
+	new = malloc(sizeof(t_arg) * 1);
 	new->ac = malloc(sizeof(char) * (i + 1));
-	while(curr->next != NULL)
-		curr = curr->next;
 	ft_strlcpy(new->ac, ch, (i + 1));
-	curr->next = new;
 	new->next = NULL;
+	if (*head == NULL)
+		*head = new;
+	else
+	{
+		while(curr->next != NULL)
+			curr = curr->next;
+		curr->next = new;
+	}
 	return (i);
 }
 
-void add_back(t_arg *head, char *ch)
+void add_back(t_arg **head, char *ch)
 {
 	t_arg	*curr;
 	t_arg	*new;
 
-	curr = head;
+	curr = *head;
 	new = malloc(sizeof(t_arg) * 1);
 	new->ac = malloc(sizeof(char) * (if_char(ch, " ") + 1));
-	while(curr->next != NULL)
-		curr = curr->next;
 	ft_strlcpy(new->ac, ch, (if_char(ch, " ") + 1));
-	curr->next = new;
 	new->next = NULL;
+	if (*head == NULL)
+		*head = new;
+	else
+	{
+		while(curr->next != NULL)
+			curr = curr->next;
+		curr->next = new;
+	}
 }
 
 void parse(char *ch, t_data *data)
 {
 	int			i;
 	t_arg	*head;
-//	t_arg	*curr;
 
 	i = 0;
-	head = malloc(sizeof(t_arg) * 1);
-	head->next = NULL;
-//	curr = head;
+	head = NULL;
 	data->argc = ft_strlen(ch);
+	printf("%s\n", ch);
 	while (ch[i] != '\0')
 	{
-		if (ch[i] != '\'' && ch[i] != '\"')
+		if ((ch[i] != '\'' && ch[i] != '\"') || (ch[i] == '\"' || ch[i] == '\''))
 		{
 			while ((ch[i] >= 9 && ch[i] <= 13) || ch[i] == ' ')
 				i++;
-//			curr->ac = malloc(sizeof(char) * (if_char(ch, " ") + 1));
-			add_back(head, &ch[i]);
-//			ft_strlcpy(curr->ac, &ch[i], (if_char(&ch[i], " ") + 1));
-			i += (if_char(&ch[i], " ") + 1);
+			add_back(&head, &ch[i]);
+			i += (if_char(&ch[i], " "));
 		}
 		else if (ch[i] == '\"' || ch[i] == '\'')
-			i += (add_back_1(head, &ch[i], &ch[i]) + 1);
+			i += (add_back_1(&head, &ch[i]));
 	}
-	while(head->next != NULL) 
+	i = 0;
+	while(head != NULL) 
 	{
+		printf("this is final : %s %d\n", head->ac, i);
 		head = head->next;
-		printf("%s\n", head->ac);
+		i++;
 	}
+	free(head);
 }
 
 void before_init(void)
