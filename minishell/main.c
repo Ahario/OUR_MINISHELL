@@ -128,6 +128,112 @@ void add_back(t_arg **head, char *ch)
 	}
 }
 
+int check_built(char *str)
+{
+	if (ft_strncmp(str, 'echo', ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, 'cd', ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, 'pwd', ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, 'unset', ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, 'env', ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, 'exit', ft_strlen(str)) == 0)
+		return (0);
+	return (1);
+}
+
+int check_q(char *str)
+{
+	int			i;
+	int dq_flag;
+
+	i = 0;
+	dq_flag = 0;
+	while (str[i] != '\0')
+	{
+		if (str[i] == '\"')
+			dq_flag = 0;
+		if (str[i] == '\'' && dq_flag == 0)
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+int check_dq(char *str)
+{
+	int			i;
+	int	q_flag;
+
+	i = 0;
+	q_flag = 0;
+	while (str[i] != '\0')
+	{
+		if (str[i] == '\'')
+			q_flag = 0;
+		if (str[i] == '\"' && q_flag == 0)
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+int check_redirect(char *str)
+{
+	if (str[0] == '>')
+		return (0);
+	else if (str[0] = '<')
+		return (0);
+	else if (str[0] = '<<')
+		return (0);
+	else if (str[0] == '>>')
+		return (0);
+	return (1);
+}
+
+int check_exitnumber(char *str)
+{
+	if (str[0] == '$' && str[1] == '?')
+		return (0);
+	return (1);
+}
+
+int check_pipe(char *str)
+{
+	if (str[0] == '|')
+		return (0);
+	return (0);
+}
+
+void assign_parse (t_data *data)
+{
+	int			i;
+	t_arg	*curr;
+
+	curr = data->cmd;
+	i = 0;
+
+	while(curr != NULL)
+	{
+		if (check_q(curr->ac) == 0)
+			assign_q(&curr);
+		else if (check_dq(curr->ac) == 0)
+			assign_dq(&curr);
+		else if (check_redirect(curr->ac) == 0)
+			assign_redirect(&curr);
+		else if (check_exitnumber(curr->ac) == 0)
+			assign_exitnumber(&curr);
+		else if (check_pipe(curr->ac) == 0)
+			assign_pipe(&curr);
+		else
+			assign_norm(&curr);
+		curr = curr->next;
+	}
+}
+
 void parse(char *ch, t_data *data)
 {
 	int			i;
@@ -136,7 +242,7 @@ void parse(char *ch, t_data *data)
 	i = 0;
 	head = NULL;
 	data->argc = ft_strlen(ch);
-	printf("%s\n", ch);
+	// printf("%s\n", ch);
 	while (ch[i] != '\0')
 	{
 		if ((ch[i] != '\'' && ch[i] != '\"') || (ch[i] == '\"' || ch[i] == '\''))
@@ -150,14 +256,17 @@ void parse(char *ch, t_data *data)
 			i += (add_back_1(&head, &ch[i]));
 	}
 	i = 0;
-	while(head != NULL) 
-	{
-		printf("this is final : %s %d\n", head->ac, i);
-		head = head->next;
-		i++;
-	}
-	free(head);
+	// while(head != NULL) 
+	// {
+	// 	printf("this is final : %s %d\n", head->ac, i);
+	// 	head = head->next;
+	// 	i++;
+	// }
+	// free(head);
+	data->cmd = head;
+	assign_parse (data);
 }
+
 
 void before_init(void)
 {
