@@ -208,6 +208,46 @@ int check_pipe(char *str)
 	return (0);
 }
 
+void assign_q(t_arg **head)
+{
+	t_arg	*curr;
+
+	curr = *head;
+	curr->type = SINQ;
+}
+
+void assign_dq(t_arg **head)
+{
+	t_arg	*curr;
+
+	curr = *head;
+	curr->type = DOUQ;
+}
+
+void assign_redirect(t_arg **head)
+{
+	t_arg	*curr;
+
+	curr = *head;
+	curr->type = RDRT;
+}
+
+void assign_pipe(t_arg **head)
+{
+	t_arg	*curr;
+
+	curr = *head;
+	curr->type = PIPE;
+}
+
+void asssign_norm(t_arg **head)
+{
+	t_arg	*curr;
+
+	curr = *head;
+	curr->type = NORM;
+}
+
 void assign_parse (t_data *data)
 {
 	int			i;
@@ -224,14 +264,13 @@ void assign_parse (t_data *data)
 			assign_dq(&curr);
 		else if (check_redirect(curr->ac) == 0)
 			assign_redirect(&curr);
-		else if (check_exitnumber(curr->ac) == 0)
-			assign_exitnumber(&curr);
 		else if (check_pipe(curr->ac) == 0)
 			assign_pipe(&curr);
 		else
 			assign_norm(&curr);
 		curr = curr->next;
 	}
+	
 }
 
 void parse(char *ch, t_data *data)

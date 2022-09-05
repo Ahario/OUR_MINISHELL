@@ -29,7 +29,7 @@ typedef struct s_data{
 enum	e_pars{
     NORM, SPCE, SINQ, DOUQ, BSLA, DOLR,
     PIPE, DPIP, SEMC, DSEM,
-    RIGT, DRGT, LEFT
+    RDRT, DRGT
 };
 
 //t_arg	*set_cmd(char *ch);
