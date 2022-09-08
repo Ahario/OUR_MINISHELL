@@ -137,7 +137,7 @@ int check_built(t_data	*data, char *str)
 	else if (ft_strncmp(str, "pwd", ft_strlen(str)) == 0)
 		return (0);
 	else if (ft_strncmp(str, "unset", ft_strlen(str)) == 0)
-		return (0);
+		ft_unset(data);
 	else if (ft_strncmp(str, "env", ft_strlen(str)) == 0)
 		ft_env(data->envp);
 	else if (ft_strncmp(str, "export", ft_strlen(str)) == 0)

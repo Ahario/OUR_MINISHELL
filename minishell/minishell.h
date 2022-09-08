@@ -45,5 +45,8 @@ void	exit2(void);
 //env
 void	ft_env(char **envp);
 void	ft_export(t_data *data);
-
+//export
+int	ft_check_key(char *str, int flag);
+//unset
+void	ft_unset(t_data *data);
 #endif

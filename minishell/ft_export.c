@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/01 21:24:56 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/08 17:15:04 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/08 22:31:33 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,23 +207,35 @@ char	**ft_change_envp(t_data *data, char *str, int len)
 	if (tem[i])
 	{
 		tem[i] = ft_change_val(tem[i], str, key, len);
+		free(key);
+		key = NULL;
 		return(tem);
 	}
 	tem = ft_new_envp(tem, key, find_value(str));
+	free(key);
+	key =NULL;
 	return (tem);
 }
 
 int	ft_check_export(t_data *data, char *key)
 {
 	char	**tem;
+	char	*check;
 	int		i;
 
 	i = 0;
 	tem = data->envp;
 	while (tem[i])
 	{
-		if (!ft_strcmp(tem[i], key))
+		check = find_key(tem[i]);
+		if (!ft_strcmp(check, key))
+		{
+			free(check);
+			check = NULL;
 			return (1);
+		}
+		free(check);
+		check = NULL;
 		i++;
 	}
 	return (0);
@@ -352,7 +364,12 @@ void	ft_export(t_data *data)
 		}
 		if (ft_strchr(tem->ac, '=') || ft_strchr(tem->ac, '+'))
 			data->envp = ft_change_envp(data, tem->ac, 0);
-		else if (!ft_check_export(data, find_key(tem->ac)))
+		else if (ft_check_export(data, find_key(tem->ac)))
+		{
+			tem = tem->next;
+			continue ;
+		}
+		else
 			data->envp = ft_new_envp(data->envp, find_key(tem->ac), NULL);
 		tem = tem->next;
 	}
