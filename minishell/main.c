@@ -1,6 +1,4 @@
- #include "libft/libft.h"
-#include "minishell.h"
-#include <stdlib.h>
+ #include "minishell.h"
 
 //t_arg *set_cmd(char *ch)
 //{
@@ -32,96 +30,281 @@ int	check(char const str, char *charset)
 	return (0);
 }
 
+// int	if_char(char const *str, char *charset)
+// {
+// 	int	i;
+
+// 	i = 0;
+// 	while (str[i] != '\0' && !(check(str[i], charset)))
+// 		i++;
+// 	return (i);
+// }
+
 int	if_char(char const *str, char *charset)
 {
-	int	i;
+	int		i;
+	int	q_flag;
+	int	dq_flag;
 
+	q_flag = 0;
+	dq_flag = 0;
 	i = 0;
-	while (str[i] != '\0' && !(check(str[i], charset)))
+	(void)charset;
+	while(str[i] != '\0')
+	{
+		if ((str[i - 1] != '\\' && str[i] == '\"') || (str[i - 1] != '\\' && str[i] == '\''))
+		{
+			if (str[i] == '\"' && q_flag == 0)
+			{
+				if (dq_flag == 1)
+					dq_flag = 0;
+				else
+					dq_flag = 1;
+			}
+			else if (str[i] == '\'' && dq_flag == 0)
+			{
+				if (q_flag == 1)
+					q_flag = 0;
+				else
+					q_flag = 1;
+			}
+		}
+		if (q_flag == 0 && dq_flag == 0 && str[i] == ' ')
+			break;
 		i++;
+	}
 	return (i);
 }
 
-int add_back_1(t_arg *head, char *ch, char *charset)
+int add_back_1(t_arg **head, char *ch)
 {
 	t_arg	*curr;
 	t_arg	*new;
-	int			i;
-	char		checking;
+	int		i;
 
 	i = 0;
-	checking = charset[0];
-	curr = head;
-	new = malloc(sizeof(t_arg) * 1);
+	curr = *head;
 	while (ch[i] != '\0')
 	{
 		i++;
-		if ((ch[i] == checking && ch[i - 1] != '\\'))
+		if ((ch[i] == ch[0] && ch[i - 1] != '\\'))
 		{
 			i++;
 			break;
 		}
 	}
+	new = malloc(sizeof(t_arg) * 1);
 	new->ac = malloc(sizeof(char) * (i + 1));
-	while(curr->next != NULL)
-		curr = curr->next;
 	ft_strlcpy(new->ac, ch, (i + 1));
-	curr->next = new;
 	new->next = NULL;
+	if (*head == NULL)
+		*head = new;
+	else
+	{
+		while(curr->next != NULL)
+			curr = curr->next;
+		curr->next = new;
+	}
 	return (i);
 }
 
-void add_back(t_arg *head, char *ch)
+void add_back(t_arg **head, char *ch)
 {
 	t_arg	*curr;
 	t_arg	*new;
 
-	curr = head;
+	curr = *head;
 	new = malloc(sizeof(t_arg) * 1);
 	new->ac = malloc(sizeof(char) * (if_char(ch, " ") + 1));
-	while(curr->next != NULL)
-		curr = curr->next;
 	ft_strlcpy(new->ac, ch, (if_char(ch, " ") + 1));
-	curr->next = new;
 	new->next = NULL;
+	if (*head == NULL)
+		*head = new;
+	else
+	{
+		while(curr->next != NULL)
+			curr = curr->next;
+		curr->next = new;
+	}
 }
 
-int	parse(char *ch, t_data *data)
+int check_built(t_data	*data, char *str)
+{
+	if (ft_strncmp(str, "echo", ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, "cd", ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, "pwd", ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, "unset", ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, "env", ft_strlen(str)) == 0)
+		ft_env(data->envp);
+	else if (ft_strncmp(str, "export", ft_strlen(str)) == 0)
+		ft_export(data);
+	else if (ft_strncmp(str, "exit", ft_strlen(str)) == 0)
+		ft_exit(data->cmd);
+	return (1);
+}
+
+int check_q(char *str)
+{
+	int			i;
+	int dq_flag;
+
+	i = 0;
+	dq_flag = 0;
+	while (str[i] != '\0')
+	{
+		if (str[i] == '\"')
+			dq_flag = 0;
+		if (str[i] == '\'' && dq_flag == 0)
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+int check_dq(char *str)
+{
+	int			i;
+	int	q_flag;
+
+	i = 0;
+	q_flag = 0;
+	while (str[i] != '\0')
+	{
+		if (str[i] == '\'')
+			q_flag = 0;
+		if (str[i] == '\"' && q_flag == 0)
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+int check_redirect(char *str)
+{
+	if (str[0] == '>')
+		return (0);
+	else if (str[0] == '<')
+		return (0);
+	else if (str[0] == '<' && str[1] == '<')
+		return (0);
+	else if (str[0] == '>' && str[1] == '>')
+		return (0);
+	return (1);
+}
+
+int check_exitnumber(char *str)
+{
+	if (str[0] == '$' && str[1] == '?')
+		return (0);
+	return (1);
+}
+
+int check_pipe(char *str)
+{
+	if (str[0] == '|')
+		return (0);
+	return (0);
+}
+
+void assign_q(t_arg **head)
+{
+	t_arg	*curr;
+
+	curr = *head;
+	curr->type = SINQ;
+}
+
+void assign_dq(t_arg **head)
+{
+	t_arg	*curr;
+
+	curr = *head;
+	curr->type = DOUQ;
+}
+
+void assign_redirect(t_arg **head)
+{
+	t_arg	*curr;
+
+	curr = *head;
+	curr->type = RDRT;
+}
+
+void assign_pipe(t_arg **head)
+{
+	t_arg	*curr;
+
+	curr = *head;
+	curr->type = PIPE;
+}
+
+void asssign_norm(t_arg **head)
+{
+	t_arg	*curr;
+
+	curr = *head;
+	curr->type = NORM;
+}
+
+void assign_parse (t_data *data)
+{
+	t_arg	*curr;
+
+	curr = data->cmd;
+
+	while(curr != NULL)
+	{
+		if (check_q(curr->ac) == 0)
+			assign_q(&curr);
+		else if (check_dq(curr->ac) == 0)
+			assign_dq(&curr);
+		else if (check_redirect(curr->ac) == 0)
+			assign_redirect(&curr);
+		else if (check_pipe(curr->ac) == 0)
+			assign_pipe(&curr);
+	//	else
+	//		assign_norm(&curr);
+		curr = curr->next;
+	}
+}
+
+void parse(char *ch, t_data *data)
 {
 	int			i;
 	t_arg	*head;
-//	t_arg	*curr;
 
 	i = 0;
-	head = malloc(sizeof(t_arg) * 1);
-	head->next = NULL;
-//	curr = head;
+	head = NULL;
 	data->argc = ft_strlen(ch);
+	// printf("%s\n", ch);
 	while (ch[i] != '\0')
 	{
-		if (ch[i] != '\'' && ch[i] != '\"')
+		if ((ch[i] != '\'' && ch[i] != '\"') || (ch[i] == '\"' || ch[i] == '\''))
 		{
 			while ((ch[i] >= 9 && ch[i] <= 13) || ch[i] == ' ')
 				i++;
-//			curr->ac = malloc(sizeof(char) * (if_char(ch, " ") + 1));
-			add_back(head, &ch[i]);
-//			ft_strlcpy(curr->ac, &ch[i], (if_char(&ch[i], " ") + 1));
-			i += (if_char(&ch[i], " ") + 1);
+			add_back(&head, &ch[i]);
+			i += (if_char(&ch[i], " "));
 		}
 		else if (ch[i] == '\"' || ch[i] == '\'')
-			i += (add_back_1(head, &ch[i], &ch[i]) + 1);
+			i += (add_back_1(&head, &ch[i]));
 	}
-/*	while(head->next != NULL)
-	{
-		head = head->next;
-		if (!exitcheck(head))
-			exit2();
-		printf("%s\n", head->ac);
-	}*/
-	head = head->next;
+	i = 0;
+	// while(head != NULL) 
+	// {
+	// 	printf("this is final : %s %d\n", head->ac, i);
+	// 	head = head->next;
+	// 	i++;
+	// }
+	// free(head);
 	data->cmd = head;
-	return (1);
+	assign_parse (data);
 }
+
 
 void before_init(void)
 {
@@ -132,21 +315,7 @@ void before_init(void)
 	tcsetattr(STDIN_FILENO, TCSANOW, &change);
 }
 
-void	ft_start(t_data *data)
-{
-	t_arg *check;
-
-	data->cmd->type = 0;
-	check = data->cmd;
-	if (!(ft_strncmp(check->ac, "exit", 5)))
-		ft_exit(check);
-	if (!(ft_strncmp(check->ac, "env", 4)))
-		ft_env(data->envp);
-	if (!(ft_strncmp(check->ac, "export", 6)))
-		ft_export(data);
-}
-
-int	main(int argc, char *argv[], char **envp)
+int	main(int argc, char *argv[], char **envp) 
 {
 	t_data			data;
 	struct termios	terminal;
@@ -161,11 +330,15 @@ int	main(int argc, char *argv[], char **envp)
 	while(1)
 	{
 		ch = readline("MINISHELL./ ");
-		if (!ch)
+//		sunglee_signal_here;
+		if (ch)
+		{
+			parse(ch, &data);
+			check_built(&data, data.cmd->ac);
+		}
+		else if (!ch)
 			exit_C_d();
 		add_history(ch);
-		if (parse(ch, &data))
-			ft_start(&data);
 		free(ch);
 	}
 	tcsetattr(STDIN_FILENO, TCSANOW, &terminal);

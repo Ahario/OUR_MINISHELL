@@ -29,7 +29,7 @@ typedef struct s_data{
 enum	e_pars{
     NORM, SPCE, SINQ, DOUQ, BSLA, DOLR,
     PIPE, DPIP, SEMC, DSEM,
-    RIGT, DRGT, LEFT
+    RDRT, DRGT
 };
 
 //t_arg	*set_cmd(char *ch);
@@ -38,6 +38,7 @@ void	ft_signal(void);
 void	exit_C_d(void);
 
 //exit
+void	error_message(char *str);
 void	ft_exit(t_arg *head);
 int	exitcheck(t_arg *head);
 void	exit2(void);
