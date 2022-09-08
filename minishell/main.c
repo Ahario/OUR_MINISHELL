@@ -1,5 +1,6 @@
  #include "minishell.h"
 
+int	exit_number;
 //t_arg *set_cmd(char *ch)
 //{
 //	t_arg	*cmd;
@@ -130,17 +131,17 @@ void add_back(t_arg **head, char *ch)
 
 int check_built(char *str)
 {
-	if (ft_strncmp(str, 'echo', ft_strlen(str)) == 0)
+	if (ft_strncmp(str, "echo", ft_strlen(str)) == 0)
 		return (0);
-	else if (ft_strncmp(str, 'cd', ft_strlen(str)) == 0)
+	else if (ft_strncmp(str, "cd", ft_strlen(str)) == 0)
 		return (0);
-	else if (ft_strncmp(str, 'pwd', ft_strlen(str)) == 0)
+	else if (ft_strncmp(str, "pwd", ft_strlen(str)) == 0)
 		return (0);
-	else if (ft_strncmp(str, 'unset', ft_strlen(str)) == 0)
+	else if (ft_strncmp(str, "unset", ft_strlen(str)) == 0)
 		return (0);
-	else if (ft_strncmp(str, 'env', ft_strlen(str)) == 0)
+	else if (ft_strncmp(str, "env", ft_strlen(str)) == 0)
 		return (0);
-	else if (ft_strncmp(str, 'exit', ft_strlen(str)) == 0)
+	else if (ft_strncmp(str, "exit", ft_strlen(str)) == 0)
 		return (0);
 	return (1);
 }
@@ -185,11 +186,11 @@ int check_redirect(char *str)
 {
 	if (str[0] == '>')
 		return (0);
-	else if (str[0] = '<')
+	else if (str[0] == '<')
 		return (0);
-	else if (str[0] = '<<')
+	else if (str[0] == '<' && str[1] == '<')
 		return (0);
-	else if (str[0] == '>>')
+	else if (str[0] == '>' && str[1] == '>')
 		return (0);
 	return (1);
 }
@@ -240,7 +241,7 @@ void assign_pipe(t_arg **head)
 	curr->type = PIPE;
 }
 
-void asssign_norm(t_arg **head)
+void assign_norm(t_arg **head)
 {
 	t_arg	*curr;
 
@@ -250,11 +251,9 @@ void asssign_norm(t_arg **head)
 
 void assign_parse (t_data *data)
 {
-	int			i;
 	t_arg	*curr;
 
 	curr = data->cmd;
-	i = 0;
 
 	while(curr != NULL)
 	{
@@ -270,7 +269,130 @@ void assign_parse (t_data *data)
 			assign_norm(&curr);
 		curr = curr->next;
 	}
-	
+	// t_arg *head = data->cmd;
+	// while(head != NULL) 
+	// {
+	// 	printf("this is final :%d\n", head->type);
+	// 	head = head->next;
+	// }
+	replace_parse (data);
+}
+
+void replace_dollar_sign(t_arg **head, int flag)
+{
+	t_arg	*curr;
+	char	*temp;
+	char	*temp2;
+	char	*str;
+	int			i;
+	curr = *head;
+
+	//flag 1 == $?
+	// flag 2 == $
+	temp = NULL;
+	temp2 = NULL;
+	str = NULL;
+	i = 0;
+
+	if (flag == 1)
+	{
+		temp = ft_itoa(exit_number);
+		str = malloc(sizeof(char) * ((ft_strlen(curr->ac) - 2) + ft_strlen(temp) + 1));
+		while (curr->ac[i] != '\0')
+		{
+			if (curr->ac[i] == '$')
+			{
+				i += 2;
+				temp2 = ft_strjoin_normal(str, temp);
+				free(str);
+				str = temp2;
+			}
+			else
+			{
+				temp2 = ft_strjoin(str, &curr->ac[i]);
+				free(str);
+				str = temp2;
+				i++;
+			}
+		}
+		free(curr->ac);
+		curr->ac = temp2;
+	}
+}
+
+void replace_parse(t_data *data)
+{
+	int			i;
+	int		flag;
+	char	*str;
+	char	*temp;
+	t_arg	*curr;
+
+	i = 0;
+	flag = 0;
+	str = NULL;
+	temp = NULL;
+	curr = data->cmd;
+
+	while (curr != NULL)
+	{
+		flag = 0;
+		i = 0;
+		if (curr->type == SINQ)
+		{
+			while(curr->ac[i] != '\0')
+			{
+				if (curr->ac[i] == '\'')
+					i++;
+				else
+				{
+					temp = ft_strjoin(str, &curr->ac[i]);
+					free(str);
+					str = temp;
+					i++;
+				}
+			}
+			free(curr->ac);
+			curr->ac = temp;
+		}
+		else if (curr->type == DOUQ)
+		{
+			while(curr->ac[i] != '\0')
+			{
+				if (curr->ac[i] == '\"')
+					i++;
+				if (curr->ac[i] == '$')
+				{
+					if (curr->ac[i] == '$' && curr->ac[i + 1] == '?')
+						flag = 1;
+					replace_dollar_sign(&curr, flag);
+					printf("checking : %s\n", curr->ac);
+				}
+				else
+				{
+					temp = ft_strjoin(str, &curr->ac[i]);
+					free(str);
+					str = temp;
+					i++;
+				}
+			}
+		}
+		temp = NULL;
+		str = NULL;
+		curr = curr->next;
+	}
+	t_arg *head = data->cmd;
+	while(head != NULL) 
+	{
+		printf("this is final : %s %d\n", head->ac, head->type);
+		head = head->next;
+	}
+
+// enum	e_pars{
+//     NORM, SPCE, SINQ, DOUQ, BSLA, DOLR,
+//     PIPE, DPIP, SEMC, DSEM,
+//     RDRT, DRGT
+// };
 }
 
 void parse(char *ch, t_data *data)
@@ -314,6 +436,7 @@ void before_init(void)
 	tcgetattr(STDIN_FILENO, &change);
 	change.c_lflag &= ~(ECHOCTL);
 	tcsetattr(STDIN_FILENO, TCSANOW, &change);
+	exit_number = 127;
 }
 
 int	main(int argc, char *argv[], char **envp)  

@@ -37,5 +37,5 @@ void	before_init(void);
 void	ft_signal(void);
 void	ft_exit(void);
 
-
+void replace_parse(t_data *data);
 #endif
