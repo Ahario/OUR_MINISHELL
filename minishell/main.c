@@ -41,7 +41,7 @@ int	check(char const str, char *charset)
 // 	return (i);
 // }
 
-int	if_char(char const *str, char *charset)
+int	if_char(char const *str)
 {
 	int		i;
 	int	q_flag;
@@ -50,24 +50,26 @@ int	if_char(char const *str, char *charset)
 	q_flag = 0;
 	dq_flag = 0;
 	i = 0;
-	(void)charset;
 	while(str[i] != '\0')
 	{
-		if ((str[i - 1] != '\\' && str[i] == '\"') || (str[i - 1] != '\\' && str[i] == '\''))
+		if (i > 1)
 		{
-			if (str[i] == '\"' && q_flag == 0)
+			if ((str[i - 1] != '\\' && str[i] == '\"') || (str[i - 1] != '\\' && str[i] == '\''))
 			{
-				if (dq_flag == 1)
-					dq_flag = 0;
-				else
-					dq_flag = 1;
-			}
-			else if (str[i] == '\'' && dq_flag == 0)
-			{
-				if (q_flag == 1)
-					q_flag = 0;
-				else
-					q_flag = 1;
+				if (str[i] == '\"' && q_flag == 0)
+				{
+					if (dq_flag == 1)
+						dq_flag = 0;
+					else
+						dq_flag = 1;
+				}
+				else if (str[i] == '\'' && dq_flag == 0)
+				{
+					if (q_flag == 1)
+						q_flag = 0;
+					else
+						q_flag = 1;
+				}
 			}
 		}
 		if (q_flag == 0 && dq_flag == 0 && str[i] == ' ')
@@ -102,9 +104,9 @@ int add_back_1(t_arg **head, char *ch)
 		*head = new;
 	else
 	{
-		while(curr->next != NULL)
+		while(curr != NULL)
 			curr = curr->next;
-		curr->next = new;
+		curr = new;
 	}
 	return (i);
 }
@@ -116,16 +118,16 @@ void add_back(t_arg **head, char *ch)
 
 	curr = *head;
 	new = malloc(sizeof(t_arg) * 1);
-	new->ac = malloc(sizeof(char) * (if_char(ch, " ") + 1));
-	ft_strlcpy(new->ac, ch, (if_char(ch, " ") + 1));
+	new->ac = malloc(sizeof(char) * (if_char(ch) + 1));
+	ft_strlcpy(new->ac, ch, (if_char(ch) + 1));
 	new->next = NULL;
 	if (*head == NULL)
 		*head = new;
 	else
 	{
-		while(curr->next != NULL)
+		while(curr != NULL)
 			curr = curr->next;
-		curr->next = new;
+		curr = new;
 	}
 }
 
@@ -156,7 +158,12 @@ int check_q(char *str)
 	while (str[i] != '\0')
 	{
 		if (str[i] == '\"')
-			dq_flag = 0;
+		{
+			if (dq_flag == 1)
+				dq_flag = 0;
+			else
+				dq_flag = 1;
+		}
 		if (str[i] == '\'' && dq_flag == 0)
 			return (0);
 		i++;
@@ -174,7 +181,12 @@ int check_dq(char *str)
 	while (str[i] != '\0')
 	{
 		if (str[i] == '\'')
-			q_flag = 0;
+		{
+			if (q_flag == 1)
+				q_flag = 0;
+			else
+				q_flag = 1;
+		}
 		if (str[i] == '\"' && q_flag == 0)
 			return (0);
 		i++;
@@ -184,13 +196,13 @@ int check_dq(char *str)
 
 int check_redirect(char *str)
 {
-	if (str[0] == '>')
-		return (0);
-	else if (str[0] == '<')
-		return (0);
-	else if (str[0] == '<' && str[1] == '<')
+	if (str[0] == '<' && str[1] == '<')
 		return (0);
 	else if (str[0] == '>' && str[1] == '>')
+		return (0);
+	else if (str[0] == '>')
+		return (0);
+	else if (str[0] == '<')
 		return (0);
 	return (1);
 }
@@ -278,7 +290,56 @@ void assign_parse (t_data *data)
 	replace_parse (data);
 }
 
-void replace_dollar_sign(t_arg **head, int flag)
+char *get_path(char *str)
+{
+	int			i;
+	int			j;
+	int			k;
+	char	*temp;
+
+	temp = NULL;
+	i = 0;
+	j = 0;
+	k = 0;
+	while(str[i] != '\0')
+	{
+		if (str[i] == '$')
+		{
+			i++;
+			while (str[i + j] != ' ' && str[i + j] != '\0' && str[i + j] != '\"')
+				j++;
+			temp = malloc(sizeof(char) * (j + 1));
+			while (k != j)
+			{
+				temp[k] = str[i + k];
+				k++;
+			}
+			temp[k] = '\0';
+			break;
+		}
+		i++;
+	}
+	return (temp);
+}
+
+int search_mini_path(int j, char *envp[], char *str)
+{
+	int	i;
+
+	i = 0;
+	while(envp[j][i] == str[i])
+	{
+		if (str[i] == envp[j][i])
+			i++;
+		else
+			return (1);
+	}
+	if (envp[j][i] == '=' && str[i] == '\0')
+		return (0);
+	return (1);
+}
+
+char *replace_dollar_sign(t_arg **head, int flag, t_data *data)
 {
 	t_arg	*curr;
 	char	*temp;
@@ -286,14 +347,12 @@ void replace_dollar_sign(t_arg **head, int flag)
 	char	*str;
 	int			i;
 	curr = *head;
-
 	//flag 1 == $?
 	// flag 2 == $
-	temp = NULL;
+	temp = NULL; 
 	temp2 = NULL;
 	str = NULL;
 	i = 0;
-
 	if (flag == 1)
 	{
 		temp = ft_itoa(exit_number);
@@ -316,8 +375,17 @@ void replace_dollar_sign(t_arg **head, int flag)
 			}
 		}
 		free(curr->ac);
-		curr->ac = temp2;
+		return (temp2);
 	}
+	else if (flag == 0)
+	{
+		temp = get_path(curr->ac);
+		while(data->envp[i] != NULL && search_mini_path(i, data->envp, temp))
+			i++;
+		printf("%s\n", data->envp[i]);
+		exit(1);
+	}
+	return (NULL);
 }
 
 void replace_parse(t_data *data)
@@ -357,6 +425,12 @@ void replace_parse(t_data *data)
 		}
 		else if (curr->type == DOUQ)
 		{
+			// if (ft_strchr(curr->ac, '$') == 1)
+			// {
+			// 	if (curr->ac[i] == '$' && curr->ac[i + 1] == '?')
+			// 		flag = 1; 
+			// 	replace_dollar_sign(&curr, flag);
+			// }
 			while(curr->ac[i] != '\0')
 			{
 				if (curr->ac[i] == '\"')
@@ -365,8 +439,7 @@ void replace_parse(t_data *data)
 				{
 					if (curr->ac[i] == '$' && curr->ac[i + 1] == '?')
 						flag = 1;
-					replace_dollar_sign(&curr, flag);
-					printf("checking : %s\n", curr->ac);
+					curr->ac = replace_dollar_sign(&curr, flag, data);
 				}
 				else
 				{
@@ -376,17 +449,19 @@ void replace_parse(t_data *data)
 					i++;
 				}
 			}
+			free(curr->ac);
+			curr->ac = temp;
 		}
 		temp = NULL;
 		str = NULL;
 		curr = curr->next;
 	}
-	t_arg *head = data->cmd;
-	while(head != NULL) 
-	{
-		printf("this is final : %s %d\n", head->ac, head->type);
-		head = head->next;
-	}
+	// t_arg *head = data->cmd;
+	// while(head != NULL) 
+	// {
+	// 	printf("this is final : %s %d\n", head->ac, head->type);
+	// 	head = head->next;
+	// }
 
 // enum	e_pars{
 //     NORM, SPCE, SINQ, DOUQ, BSLA, DOLR,
@@ -403,7 +478,6 @@ void parse(char *ch, t_data *data)
 	i = 0;
 	head = NULL;
 	data->argc = ft_strlen(ch);
-	// printf("%s\n", ch);
 	while (ch[i] != '\0')
 	{
 		if ((ch[i] != '\'' && ch[i] != '\"') || (ch[i] == '\"' || ch[i] == '\''))
@@ -411,7 +485,7 @@ void parse(char *ch, t_data *data)
 			while ((ch[i] >= 9 && ch[i] <= 13) || ch[i] == ' ')
 				i++;
 			add_back(&head, &ch[i]);
-			i += (if_char(&ch[i], " "));
+			i += (if_char(&ch[i]));
 		}
 		else if (ch[i] == '\"' || ch[i] == '\'')
 			i += (add_back_1(&head, &ch[i]));
@@ -423,9 +497,9 @@ void parse(char *ch, t_data *data)
 	// 	head = head->next;
 	// 	i++;
 	// }
-	// free(head);
+	//data->cmd = NULL;
 	data->cmd = head;
-	assign_parse (data);
+	//assign_parse (data);
 }
 
 
@@ -454,7 +528,6 @@ int	main(int argc, char *argv[], char **envp)
 	while(1)
 	{
 		ch = readline("MINISHELL./ ");
-//		sunglee_signal_here;
 		if (ch)
 			parse(ch, &data);
 		else if (!ch)

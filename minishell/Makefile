@@ -6,6 +6,7 @@ OBJS = ${SRCS:.c=.o}
 CC = gcc
 CFLAGS	= -Werror -Wall -Wextra
 CFLAGS += -I $(LIBRD)/include -I ./libft/
+#CFLAGS += -g -fsanitize=address
 LIBRD = $(shell brew --prefix readline)
 READLINE_OP	= -lreadline -L $(LIBRD)/lib
 
