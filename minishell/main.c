@@ -104,7 +104,7 @@ int add_back_1(t_arg **head, char *ch)
 		*head = new;
 	else
 	{
-		while(curr != NULL)
+		while(curr->next != NULL)
 			curr = curr->next;
 		curr = new;
 	}
@@ -125,9 +125,9 @@ void add_back(t_arg **head, char *ch)
 		*head = new;
 	else
 	{
-		while(curr != NULL)
+		while(curr->next != NULL)
 			curr = curr->next;
-		curr = new;
+		curr->next = new;
 	}
 }
 
@@ -456,18 +456,13 @@ void replace_parse(t_data *data)
 		str = NULL;
 		curr = curr->next;
 	}
-	// t_arg *head = data->cmd;
-	// while(head != NULL) 
-	// {
-	// 	printf("this is final : %s %d\n", head->ac, head->type);
-	// 	head = head->next;
-	// }
+	t_arg *head = data->cmd;
+	while(head != NULL) 
+	{
+		printf("this is final : %s %d\n", head->ac, head->type);
+		head = head->next;
+	}
 
-// enum	e_pars{
-//     NORM, SPCE, SINQ, DOUQ, BSLA, DOLR,
-//     PIPE, DPIP, SEMC, DSEM,
-//     RDRT, DRGT
-// };
 }
 
 void parse(char *ch, t_data *data)
@@ -497,9 +492,9 @@ void parse(char *ch, t_data *data)
 	// 	head = head->next;
 	// 	i++;
 	// }
-	//data->cmd = NULL;
+	data->cmd = NULL;
 	data->cmd = head;
-	//assign_parse (data);
+	assign_parse (data);
 }
 
 
