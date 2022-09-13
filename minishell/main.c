@@ -131,11 +131,11 @@ void add_back(t_arg **head, char *ch)
 int check_built(t_data	*data, char *str)
 {
 	if (ft_strncmp(str, "echo", ft_strlen(str)) == 0)
-		return (0);
+		ft_echo(data);
 	else if (ft_strncmp(str, "cd", ft_strlen(str)) == 0)
-		return (0);
+		ft_cd(data);
 	else if (ft_strncmp(str, "pwd", ft_strlen(str)) == 0)
-		return (0);
+		ft_pwd(data);
 	else if (ft_strncmp(str, "unset", ft_strlen(str)) == 0)
 		ft_unset(data);
 	else if (ft_strncmp(str, "env", ft_strlen(str)) == 0)

@@ -47,6 +47,13 @@ void	ft_env(char **envp);
 void	ft_export(t_data *data);
 //export
 int	ft_check_key(char *str, int flag);
+char	*find_value(char *envp);
 //unset
 void	ft_unset(t_data *data);
+//pwd
+void	ft_pwd(t_data *data);
+//cd
+void	ft_cd(t_data *data);
+//
+void	ft_echo(t_data *data);
 #endif

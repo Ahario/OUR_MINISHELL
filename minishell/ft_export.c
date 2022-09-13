@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/01 21:24:56 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/08 22:31:33 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/13 15:22:38 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,6 @@ char	*find_value(char *envp)
 		ret[size--] = envp[--i];
 	return (ret);
 }
-
-
 
 char	**print_array(char **envp)
 {
@@ -103,10 +101,15 @@ void	ft_export_narg(char **envp)
 		printf("declare -x ");
 		printf("%s", key);
 		if (val)
+		{
 			printf ("=\"%s\"\n", val);
+			free(val);
+		}
 		else
 			printf ("\n");
 		i++;
+		free(key);
+		key = NULL;
 	}
 }
 
@@ -207,8 +210,6 @@ char	**ft_change_envp(t_data *data, char *str, int len)
 	if (tem[i])
 	{
 		tem[i] = ft_change_val(tem[i], str, key, len);
-		free(key);
-		key = NULL;
 		return(tem);
 	}
 	tem = ft_new_envp(tem, key, find_value(str));
@@ -345,6 +346,7 @@ int	ft_export_parse(t_arg *arg)
 void	ft_export(t_data *data)
 {
 	t_arg	*tem;
+	char	*key;
 
 	if (!data->cmd->next)
 	{
@@ -362,15 +364,22 @@ void	ft_export(t_data *data)
 			printf ("\'%s\': not a vaild identifier\n", tem->ac);
 			return;
 		}
+		key = find_key(tem->ac);
 		if (ft_strchr(tem->ac, '=') || ft_strchr(tem->ac, '+'))
-			data->envp = ft_change_envp(data, tem->ac, 0);
-		else if (ft_check_export(data, find_key(tem->ac)))
 		{
+			data->envp = ft_change_envp(data, tem->ac, 0);
+		}
+		else if (ft_check_export(data, key))
+		{
+			if (key)
+				free(key);
 			tem = tem->next;
 			continue ;
 		}
 		else
-			data->envp = ft_new_envp(data->envp, find_key(tem->ac), NULL);
+			data->envp = ft_new_envp(data->envp, key, NULL);
 		tem = tem->next;
+		free(key);
+		key = NULL;
 	}
 }

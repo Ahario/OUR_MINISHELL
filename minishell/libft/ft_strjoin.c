@@ -6,7 +6,7 @@
 /*   By: hyeo <hyeo@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/16 14:08:47 by hyeo              #+#    #+#             */
-/*   Updated: 2022/09/05 01:04:04 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/08 23:47:10 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,11 +95,12 @@ char	*ft_strjoin_keyval(char const *s1, char const *s2)
 		temp[i] = s2[j++];
 		i++;
 	}
-	if(s1)
+	if (s1)
 	{
 		free((char *)s1);
 		s1 = NULL;
 	}
+
 	if (s2)
 	{
 		free((char *)s2);

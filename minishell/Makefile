@@ -3,12 +3,15 @@ SRCS = main.c \
 	   ft_exit.c\
 	   ft_env.c\
 	   ft_export.c\
-	   ft_unset.c
+	   ft_unset.c\
+	   ft_pwd.c\
+	   ft_cd.c\
+	   ft_echo.c
 LIBFT = -L ./libft -lft
 LIBSRCS = libft
 OBJS = ${SRCS:.c=.o}
 CC = gcc
-CFLAGS	= -Werror -Wall -Wextra
+CFLAGS	= -Werror -Wall -Wextra -g3 -fsanitize=address
 CFLAGS += -I $(LIBRD)/include -I ./libft/
 LIBRD = $(shell brew --prefix readline)
 READLINE_OP	= -lreadline -L $(LIBRD)/lib
