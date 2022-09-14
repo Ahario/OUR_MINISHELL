@@ -304,7 +304,8 @@ char *get_path(char *str)
 		if (str[i] == '$')
 		{
 			i++;
-			while (str[i + j] != ' ' && str[i + j] != '\0' && str[i + j] != '\"')
+			while (str[i + j] != ' ' && str[i + j] != '\0' 
+					&& str[i + j] != '\"' && str[i + j] != '\'')
 				j++;
 			temp = malloc(sizeof(char) * (j + 1));
 			while (k != j)
@@ -344,13 +345,16 @@ void replace_dollar_sign(t_arg **head, int flag, t_data *data)
 	char	*temp2;
 	char	*str;
 	int			i;
+	int			j;
+	int			k;
+
 	curr = *head;
-	//flag 1 == $?
-	// flag 2 == $
 	temp = NULL; 
 	temp2 = NULL;
 	str = NULL;
 	i = 0;
+	j = 0;
+	k = 0;
 	if (flag == 1)
 	{
 		temp = ft_itoa(exit_number);
@@ -377,62 +381,47 @@ void replace_dollar_sign(t_arg **head, int flag, t_data *data)
 	}
 	else if (flag == 0)
 	{
-		temp = get_path(curr->ac);
-		while(data->envp[i] != NULL && search_mini_path(i, data->envp, temp))
-			i++;
-		printf("%s\n", data->envp[i]);
-		exit(1);
+		while(curr->ac[k] != '\0')
+		{
+			if (curr->ac[k] == '$')
+			{
+				temp = get_path(curr->ac);
+				while(data->envp[i] != NULL && search_mini_path(i, data->envp, temp))
+					i++;
+				if (data->envp[i] != NULL)
+				{
+					while(data->envp[i][j] != '=')
+						j++;
+					j++;
+					while (data->envp[i][j] != '\0')
+					{
+						temp2 = ft_strjoin(str, &data->envp[i][j]);
+						free(str);
+						str = temp2;
+						j++;
+					}
+				}
+				k += (ft_strlen(temp) + 1);
+				free(temp);
+				temp = NULL;
+			}
+			else
+			{
+				temp2 = ft_strjoin(str, &curr->ac[k]);
+				free(str);
+				str = temp2;
+				k++;
+			}
+		}
+		free(curr->ac);
+		curr->ac = temp2;
 	}
-
-// 		int	search_path(int i, char *envp[])
-// {
-// 	if (envp[i][0] == 'P' && envp[i][1] == 'A'
-// 		&& envp[i][2] == 'T' && envp[i][3] == 'H')
-// 		return (0);
-// 	return (1);
-// }
-
-// char	*search_filename(char *command, char *envp[])
-// {
-// 	int		i;
-// 	int		j;
-// 	char	*filename;
-
-// 	i = 0;
-// 	j = 5;
-// 	while (envp[i] != NULL && search_path(i, envp))
-// 		i++;
-// 	if (ft_strchr(command, "/") == 1)
-// 		filename = ft_strdup(command);
-// 	else
-// 		filename = my_parsing_filename(i, j, command, envp);
-// 	return (filename);
-// }
-
-// 	while (envp[i][j] != '\0')
-// 	{
-// 		if (envp[i][j] != ':')
-// 		{
-// 			temp = ft_strjoin_for_parsing(new_filename, envp[i][j]);
-// 			free(new_filename);
-// 			new_filename = temp;
-// 		}
-// 		if (envp[i][j] == ':' || envp[i][j + 1] == '\0')
-// 		{
-// 			temp = ft_strjoin(new_filename, command);
-// 			free(new_filename);
-// 			if (access(temp, F_OK) == 0)
-// 				return (temp);
-// 			free(temp);
-// 			new_filename = NULL;
-// 			temp = NULL;
-// 		}
-// 		j++;
-// 	}
-// 	return (NULL);
-// }
-	//printf("changing : %s\n", curr->ac);
+	// printf("%s\n", temp2);
 }
+
+// char *replace_sinq()
+
+// char *replace_douq
 
 void replace_parse(t_data *data)
 {
@@ -471,12 +460,6 @@ void replace_parse(t_data *data)
 		}
 		else if (curr->type == DOUQ)
 		{
-			// if (ft_strchr(curr->ac, '$') == 1)
-			// {
-			// 	if (curr->ac[i] == '$' && curr->ac[i + 1] == '?')
-			// 		flag = 1; 
-			// 	replace_dollar_sign(&curr, flag);
-			// }
 			while(curr->ac[i] != '\0')
 			{
 				if (curr->ac[i] == '\"')
@@ -486,6 +469,7 @@ void replace_parse(t_data *data)
 					if (curr->ac[i] == '$' && curr->ac[i + 1] == '?')
 						flag = 1;
 					replace_dollar_sign(&curr, flag, data);
+					flag = 2;
 				}
 				else
 				{
@@ -495,12 +479,26 @@ void replace_parse(t_data *data)
 					i++;
 				}
 			}
-			free(curr->ac);
-			curr->ac = temp;
+			if (flag != 2)
+			{
+				free(curr->ac);
+				curr->ac = temp;
+			}
 		}
 		temp = NULL;
 		str = NULL;
 		curr = curr->next;
+	}
+	t_arg *hed = data->cmd;
+	while(hed != NULL) 
+	{
+		int x = 0;
+		while (hed->ac[x] != '\0')
+		{
+			printf("%c\n", hed->ac[x]);
+			x++;
+		}
+		hed = hed->next;
 	}
 	// t_arg *head = data->cmd;
 	// while(head != NULL) 
@@ -509,11 +507,6 @@ void replace_parse(t_data *data)
 	// 	head = head->next;
 	// }
 
-// enum	e_pars{
-//     NORM, SPCE, SINQ, DOUQ, BSLA, DOLR,
-//     PIPE, DPIP, SEMC, DSEM,
-//     RDRT, DRGT
-// };
 }
 
 void parse(char *ch, t_data *data)
