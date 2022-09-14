@@ -6,11 +6,10 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/01 21:24:56 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/13 15:22:38 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/14 15:11:58 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft/libft.h"
 #include "minishell.h"
 
 char	*find_key(char *envp)
@@ -18,11 +17,13 @@ char	*find_key(char *envp)
 	int		i;
 	char	*ret;
 
-	i = 1;
+	i = 0;
 	ret = NULL;
-	while (envp[i] != '=' && envp[i] != '+' && envp[i])
+	if (!envp)
+		return(NULL);
+	while (envp[i] && envp[i] != '=' && envp[i] != '+')
 		i++;
-	ret = (char *)malloc(sizeof(char) * i);
+	ret = (char *)malloc(sizeof(char) * i + 1);
 	ret[i] = '\0';
 	while (--i >= 0)
 		ret[i] = envp[i];
@@ -46,11 +47,10 @@ char	*find_value(char *envp)
 	j = i;
 	while (envp[i])
 		i++;
-	size = i - j - 1;
+	size = i - j;
 	ret = (char *)malloc(sizeof(char) * size);
-	ret[size] = '\0';
 	while (size >= 0)
-		ret[size--] = envp[--i];
+		ret[size--] = envp[i--];
 	return (ret);
 }
 
@@ -71,7 +71,7 @@ char	**print_array(char **envp)
 		i = 0;
 		while (i < size)
 		{
-			if (ft_strcmp(array[i], array[i + 1]) > 0)
+			if (array[i] && ft_strcmp(array[i], array[i + 1]) > 0)
 			{
 				tem = array[i];
 				array[i] = array[i + 1];
@@ -93,13 +93,19 @@ void	ft_export_narg(char **envp)
 
 	i = 0;
 
+	key	= NULL;
+	val = NULL;
 	array = print_array(envp);
 	while (array[i])
 	{
 		key = find_key(array[i]);
 		val = find_value(array[i]);
-		printf("declare -x ");
-		printf("%s", key);
+		if (key)
+		{
+			printf("declare -x ");
+			printf ("%s", key);
+			free(key);
+		}
 		if (val)
 		{
 			printf ("=\"%s\"\n", val);
@@ -108,8 +114,6 @@ void	ft_export_narg(char **envp)
 		else
 			printf ("\n");
 		i++;
-		free(key);
-		key = NULL;
 	}
 }
 
@@ -138,7 +142,7 @@ int	ft_check_key(char *str, int flag)
 	return (0);
 }
 
-char	*ft_change_val(char *envp, char *str, char *key, int len)
+char	*ft_change_val(char *envp, char *str, int len)
 {
 	if (envp)
 	{
@@ -149,7 +153,6 @@ char	*ft_change_val(char *envp, char *str, char *key, int len)
 			free(envp);
 			envp = ft_strdup(str);
 		}
-		free (key);
 	}
 	return (envp);
 }
@@ -184,12 +187,7 @@ char	**ft_new_envp(char **tem, char *key, char *val)
 	}
 	ret[size++] = ft_strjoin_keyval(key, val);
 	ret[size] = NULL;
-/*	while (tem)
-	{
-		free(*tem);
-		*tem = NULL;
-		tem++;
-	}*/
+	free(tem);
 	return (ret);
 }
 
@@ -209,12 +207,11 @@ char	**ft_change_envp(t_data *data, char *str, int len)
 		i++;
 	if (tem[i])
 	{
-		tem[i] = ft_change_val(tem[i], str, key, len);
+		tem[i] = ft_change_val(tem[i], str, len);
+		free(key);
 		return(tem);
 	}
 	tem = ft_new_envp(tem, key, find_value(str));
-	free(key);
-	key =NULL;
 	return (tem);
 }
 
@@ -277,7 +274,7 @@ char	*change_arg(char *arg, char c)
 	arg = NULL;
 	return (ret);
 }
-
+/*
 char	*ft_dollar_change(char *arg)
 {
 	int		i;
@@ -311,7 +308,6 @@ char	*ft_dollar_change(char *arg)
 	return (ret);
 }
 
-
 int	ft_export_parse(t_arg *arg)
 {
 	t_arg *tem;
@@ -342,7 +338,7 @@ int	ft_export_parse(t_arg *arg)
 	}
 	return (0);
 }
-
+*/
 void	ft_export(t_data *data)
 {
 	t_arg	*tem;
@@ -354,8 +350,8 @@ void	ft_export(t_data *data)
 		return ;
 	}
 	tem = data->cmd->next;
-	if (ft_export_parse(tem))
-		return ;
+//	if (ft_export_parse(tem))
+//		return ;
 	while (tem)
 	{
 		if (ft_check_key(tem->ac, 1))
@@ -368,18 +364,16 @@ void	ft_export(t_data *data)
 		if (ft_strchr(tem->ac, '=') || ft_strchr(tem->ac, '+'))
 		{
 			data->envp = ft_change_envp(data, tem->ac, 0);
+			free(key);
 		}
 		else if (ft_check_export(data, key))
 		{
-			if (key)
-				free(key);
+			free(key);
 			tem = tem->next;
 			continue ;
 		}
 		else
 			data->envp = ft_new_envp(data->envp, key, NULL);
 		tem = tem->next;
-		free(key);
-		key = NULL;
 	}
 }

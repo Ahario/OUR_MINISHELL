@@ -32,6 +32,7 @@ enum	e_pars{
     RDRT, DRGT
 };
 
+void replace_parse(t_data *data);
 //t_arg	*set_cmd(char *ch);
 void	before_init(void);
 void	ft_signal(void);
@@ -46,6 +47,7 @@ void	exit2(void);
 void	ft_env(char **envp);
 void	ft_export(t_data *data);
 //export
+char	*find_key(char *envp);
 int	ft_check_key(char *str, int flag);
 char	*find_value(char *envp);
 //unset

@@ -6,7 +6,7 @@
 /*   By: hyeo <hyeo@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/16 14:45:32 by hyeo              #+#    #+#             */
-/*   Updated: 2022/09/05 15:52:22 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/14 01:30:10 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,10 @@ void	*ft_calloc(size_t count, size_t size);
 char	*ft_strdup(const char *s1);
 
 char	*ft_substr(char const *s, unsigned int start, size_t len);
-char	*ft_strjoin(char const *s1, char const *s2);
+char	*ft_strjoin(char *s1, char *s2);
 char	*ft_strjoin_free(char const *s1, char const *s2);
 char	*ft_strjoin_keyval(char const *s1, char const *s2);
+char	*ft_strjoin_normal(char const *s1, char const *s2);
 char	*ft_strtrim(char const *s1, char const *set);
 char	**ft_split(char const *s, char *c);
 char	*ft_itoa(int n);

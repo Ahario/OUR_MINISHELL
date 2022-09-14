@@ -11,7 +11,7 @@ LIBFT = -L ./libft -lft
 LIBSRCS = libft
 OBJS = ${SRCS:.c=.o}
 CC = gcc
-CFLAGS	= -Werror -Wall -Wextra -g3 -fsanitize=address
+CFLAGS	= -Werror -Wall -Wextra #-g3 -fsanitize=address
 CFLAGS += -I $(LIBRD)/include -I ./libft/
 LIBRD = $(shell brew --prefix readline)
 READLINE_OP	= -lreadline -L $(LIBRD)/lib
