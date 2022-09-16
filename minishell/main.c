@@ -1,4 +1,4 @@
- #include "minishell.h"
+#include "minishell.h"
 
 int	exit_number;
 //t_arg *set_cmd(char *ch)
@@ -24,12 +24,12 @@ int	exit_number;
 //    target->next = newNode;
 //}
 
-int	check(char const str, char *charset)
+/*int	check(char const str, char *charset)
 {
 	if (str == charset[0])
 		return (1);
 	return (0);
-}
+}*/
 
 // int	if_char(char const *str, char *charset)
 // {
@@ -131,7 +131,7 @@ void add_back(t_arg **head, char *ch)
 	}
 }
 
-int check_built(t_data *data, char *str)
+/*int check_built(t_data *data, char *str)
 {
 	if (ft_strncmp(str, "echo", ft_strlen(str)) == 0)
 		ft_echo(data);
@@ -148,7 +148,28 @@ int check_built(t_data *data, char *str)
 	else if (ft_strncmp(str, "exit", ft_strlen(str)) == 0)
 		ft_exit(data->cmd);
 	return (1);
+}*/
+
+int check_built(t_data *data, char *str)
+{
+	(void)data;
+	if (ft_strncmp(str, "echo", ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, "cd", ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, "pwd", ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, "export", ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, "unset", ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, "env", ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, "exit", ft_strlen(str)) == 0)
+		return (0);
+	return (1);
 }
+
 
 int check_q(char *str)
 {
@@ -558,7 +579,8 @@ int	main(int argc, char *argv[], char **envp)
 		if (ch)
 		{
 			parse(ch, &data);
-			check_built(&data, data.cmd->ac);
+			ft_redir(&data);
+			ft_cmd_start(&data);
 		}
 		else if (!ch)
 			exit_C_d();

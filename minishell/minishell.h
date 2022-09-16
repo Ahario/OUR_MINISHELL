@@ -9,12 +9,13 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft/libft.h"
+# include <fcntl.h>
+# include <sys/types.h>
+# include <sys/stat.h>
 
 typedef struct s_arg{
 	char	*ac;
 	int		type;
-	int		fd_in;
-	int		fd_out;
 	struct s_arg	*next;
 }	t_arg;
 
@@ -23,6 +24,8 @@ typedef struct s_data{
 	int		argc;
 	char	**argv;
 	char	**envp;
+	int		fd_out;
+	int		fd_in;
 }	t_data;
 
 
@@ -33,6 +36,7 @@ enum	e_pars{
 };
 
 void replace_parse(t_data *data);
+int check_built(t_data *data, char *str);
 //t_arg	*set_cmd(char *ch);
 void	before_init(void);
 void	ft_signal(void);
@@ -58,4 +62,10 @@ void	ft_pwd(t_data *data);
 void	ft_cd(t_data *data);
 //
 void	ft_echo(t_data *data);
+//
+void	ft_redir(t_data *data);
+//cmd
+void	ft_cmd_start(t_data *data);
+//free_utils
+void	free_split(char **str);
 #endif

@@ -6,7 +6,7 @@
 /*   By: hyeo <hyeo@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/16 09:40:13 by hyeo              #+#    #+#             */
-/*   Updated: 2021/12/02 19:46:21 by hyeo             ###   ########.fr       */
+/*   Updated: 2022/09/17 00:37:14 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ char	**malloc_free(char **all)
 char	**ft_split(char const *s, char *c)
 {
 	int		i;
-	int		total; 
+	int		total;
 	char	**dest;
 
 	i = 0;

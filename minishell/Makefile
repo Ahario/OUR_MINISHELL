@@ -6,7 +6,10 @@ SRCS = main.c \
 	   ft_unset.c\
 	   ft_pwd.c\
 	   ft_cd.c\
-	   ft_echo.c
+	   ft_echo.c\
+	   ft_redir.c\
+	   free_utils.c\
+	   ft_cmd.c
 LIBFT = -L ./libft -lft
 LIBSRCS = libft
 OBJS = ${SRCS:.c=.o}
