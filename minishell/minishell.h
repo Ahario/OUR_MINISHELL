@@ -16,6 +16,7 @@
 typedef struct s_arg{
 	char	*ac;
 	int		type;
+	struct s_arg	*prev;
 	struct s_arg	*next;
 }	t_arg;
 
@@ -37,6 +38,7 @@ enum	e_pars{
 
 void replace_parse(t_data *data);
 int check_built(t_data *data, char *str);
+void play_built(t_data *data, char *str);
 //t_arg	*set_cmd(char *ch);
 void	before_init(void);
 void	ft_signal(void);
@@ -68,4 +70,8 @@ void	ft_redir(t_data *data);
 void	ft_cmd_start(t_data *data);
 //free_utils
 void	free_split(char **str);
+struct s_arg	*ft_list_del(t_arg *cmd);
+//redir
+void	ft_redir(t_data	*data);
+void	ft_redirect_restore(t_data *data, int flag);
 #endif

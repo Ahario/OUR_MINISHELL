@@ -131,7 +131,7 @@ void add_back(t_arg **head, char *ch)
 	}
 }
 
-/*int check_built(t_data *data, char *str)
+void play_built(t_data *data, char *str)
 {
 	if (ft_strncmp(str, "echo", ft_strlen(str)) == 0)
 		ft_echo(data);
@@ -147,8 +147,8 @@ void add_back(t_arg **head, char *ch)
 		ft_env(data->envp);
 	else if (ft_strncmp(str, "exit", ft_strlen(str)) == 0)
 		ft_exit(data->cmd);
-	return (1);
-}*/
+	return ;
+}
 
 int check_built(t_data *data, char *str)
 {

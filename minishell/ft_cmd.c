@@ -6,33 +6,40 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 14:46:05 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/17 01:41:19 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/19 13:30:04 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/libft.h"
 #include "minishell.h"
 
+int	ft_list_len(t_arg *cmd)
+{
+	int	len;
+
+	len = 0;
+	while (cmd  && cmd->ac)
+	{
+		cmd = cmd->next;
+		len++;
+	}
+	return (len);
+}
+
 char	**ft_arg_split(t_arg *cmd)
 {
 	char	**ret;
 	int		len;
-	t_arg	*start;
 	int		i;
 
-	start = cmd;
-	len = 0;
+	len = ft_list_len(cmd);
 	i = 0;
-	while (start->next)
-	{
-		start = start->next;
-		len++;
-	}
-	ret = (char **)malloc(sizeof(char *) * len + 1);
-	while (len-- >= 0)
+	ret = (char **)malloc(sizeof(char *) * (len));
+	while (len-- > 0)
 	{
 		ret[i++] = cmd->ac;
-		printf ("!!!!!!!!!%s\n", cmd->ac);
+//		printf ("!!!!!!!!!%s\n", cmd->ac);
+//		printf ("!!!!!!!!!%d\n", len);
 		cmd = cmd->next;
 	}
 	ret[i] = NULL;
@@ -42,18 +49,21 @@ char	**ft_arg_split(t_arg *cmd)
 void	ft_child_cmd(t_data *data, char *cmd)
 {
 	char **arg;
-	int	i;
+//	int	i;
 
-	i = 0;
+//	i = 0;
+	ft_redirect_restore(data, 0);
 	arg = ft_arg_split(data->cmd);
-	printf ("cmd %s\n", cmd);
-	while (arg[i])
-		printf ("arg %s\n", arg[i++]);
+//	printf ("cmd %s\n", cmd);
+//	while (arg[i])
+//		printf ("arg %s\n", arg[i++]);
 	if (execve(cmd, arg, data->envp))
 	{
+		ft_redirect_restore(data, 1);
 		free(cmd);
 		exit (0);
 	}
+	exit (0);
 }
 
 char	*ft_home_path(t_data *data)
@@ -166,9 +176,6 @@ void	ft_one_cmd(t_data *data)
 		free(cmd);
 		waitpid(pid, &ret, 0);
 	}
-
-
-
 }
 
 void	ft_cmd_start(t_data *data)
@@ -186,8 +193,9 @@ void	ft_cmd_start(t_data *data)
 	}
 	if(!check_built(data, cmd->ac))
 	{
-		//ft_redirect_restore(data, 0);
-
+		ft_redirect_restore(data, 0);
+		play_built(data, cmd->ac);
+		ft_redirect_restore(data, 1);
 	}
 	else
 		ft_one_cmd(data);
