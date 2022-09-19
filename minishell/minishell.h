@@ -29,7 +29,7 @@ typedef struct s_data{
 enum	e_pars{
     NORM, SPCE, SINQ, DOUQ, BSLA, DOLR,
     PIPE, DPIP, SEMC, DSEM,
-    RIGT, DRGT, LEFT
+    RDRT, DRGT
 };
 
 //t_arg	*set_cmd(char *ch);
@@ -37,5 +37,7 @@ void	before_init(void);
 void	ft_signal(void);
 void	ft_exit(void);
 
-
+void replace_ds_parse(t_data *data);
+char *replace_dollar_sign(char *str, t_data *data);
+void replace_parse(t_data *data);
 #endif
