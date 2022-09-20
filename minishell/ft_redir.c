@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 12:04:06 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/19 16:39:50 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/20 19:41:59 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,19 +29,30 @@ static int	check_str(char c,char *str)
 	return (0);
 }
 
-void	ft_open_flag(t_data *data, char *filename, int flag)
+int	ft_open_flag(t_data *data, char *filename, int flag)
 {
+	int	ret ;
+
+	ret = 0;
 	if (flag == 0)
 	{
 		close(data->fd_in);
-		data->fd_in = open(filename, O_RDONLY);
+		ret	= open(filename, O_RDONLY);
+		data->fd_in = ret;
 	}
 	else if (flag == 1)
 	{
 		close(data->fd_out);
-		data->fd_out = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		ret = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		data->fd_out = ret;
 	}
-
+	else if (flag == 2)
+	{
+		close(data->fd_out);
+		ret = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		data->fd_out = ret;
+	}
+	return (ret);
 }
 
 int	infilename_check(t_data *data, char *str, int *i, int flag)
@@ -57,7 +68,7 @@ int	infilename_check(t_data *data, char *str, int *i, int flag)
 			return (1);
 		j++;
 	}
-	size = j;
+	size = j - *i;
 //	if (flag)
 //		size = j + 1;
 	(*i) += size;
@@ -65,10 +76,9 @@ int	infilename_check(t_data *data, char *str, int *i, int flag)
 	if (!filename)
 		return (1);
 	while (size >= 0)
-		filename[--size] = str[j--];
+		filename[size--] = str[j--];
 //	printf("%s\n", filename);
-	ft_open_flag(data, filename, flag);
-	if (data->fd_in == -1)
+	if (ft_open_flag(data, filename, flag) == -1)
 	{
 		error_message("MINISHELL: ");
 		printf ("%s: No such file or directory\n", filename);
@@ -87,12 +97,41 @@ struct s_arg	*ft_symbol(t_data *data, t_arg *cmd)
 	int		i;
 	int		flag;
 
+	prev = NULL;
 	while (cmd)
 	{
 		i = 0;
-		prev = cmd;
 		str = cmd->ac;
-		if ((str[i] == '<' || str[i] == '>')) //&& tem->type == 0)
+		if ((str[i] == '>' && str[i + 1] == '>'))
+		{
+			flag = 2;
+			if (str[i + 2] == '\0')
+			{
+				cmd = ft_list_del(cmd);
+				str = cmd->ac;
+			}
+			else
+				i += 2;
+			if(!infilename_check(data, str, &i, flag))
+				if (cmd)
+					cmd = ft_list_del(cmd);
+		}
+		else if ((str[i] == '<' && str[i + 1] == '<'))
+		{
+			if (str[i + 2] == '\0')
+			{
+				cmd = ft_list_del(cmd);
+				str = cmd->ac;
+			}
+			else
+				i += 2;
+			ft_here_doc(data, str, &i, NULL);
+			if (!cmd->prev)
+				prev = NULL;
+			if (cmd)
+				cmd = ft_list_del(cmd);
+		}
+		else if ((str[i] == '<' || str[i] == '>')) //&& tem->type == 0)
 		{
 			if (str[i] == '<')
 			{
@@ -125,10 +164,14 @@ struct s_arg	*ft_symbol(t_data *data, t_arg *cmd)
 
 		}
 		else
+		{
+			if (!prev)
+				prev = cmd;
 			cmd = cmd->next;
+		}
 	}
 	cmd = prev;
-	while (cmd->prev)
+	while (cmd && cmd->prev)
 		cmd = cmd->prev;
 	return (cmd);
 }

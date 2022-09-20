@@ -74,4 +74,6 @@ struct s_arg	*ft_list_del(t_arg *cmd);
 //redir
 void	ft_redir(t_data	*data);
 void	ft_redirect_restore(t_data *data, int flag);
+//here_doc
+void	ft_here_doc(t_data *data, char *str, int *i, char *stop);
 #endif

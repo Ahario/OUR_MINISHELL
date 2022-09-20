@@ -9,7 +9,8 @@ SRCS = main.c \
 	   ft_echo.c\
 	   ft_redir.c\
 	   free_utils.c\
-	   ft_cmd.c
+	   ft_cmd.c\
+	   ft_here_doc.c
 LIBFT = -L ./libft -lft
 LIBSRCS = libft
 OBJS = ${SRCS:.c=.o}

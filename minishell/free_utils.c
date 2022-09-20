@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 15:38:47 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/19 13:35:23 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/20 16:58:08 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ struct s_arg	*ft_list_del(t_arg *cmd)
 		cmd->next->prev = prev;
 	free(cmd->ac);
 	free(cmd);
+	cmd = NULL;
 	cmd = next;
 	return (cmd);
 }
