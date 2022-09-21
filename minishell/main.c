@@ -1,28 +1,6 @@
  #include "minishell.h"
 
 int	exit_number;
-//t_arg *set_cmd(char *ch)
-//{
-//	t_arg	*cmd;
-//	int			i;
-//
-//	i = 0;
-//	char	**ac;
-//	int		type;
-//	int		fd_in;
-//	int		fd_out;
-//	int		if_next;
-//	return (cmd);
-//}
-
-//void addFirst(t_arg *target, int data)
-//{
-//   t_arg *newNode = malloc(sizeof(t_arg) * 1);
-//    newNode->next = target->next;
-//    newNode->data = data;
-
-//    target->next = newNode;
-//}
 
 int	check(char const str, char *charset)
 {
@@ -31,19 +9,21 @@ int	check(char const str, char *charset)
 	return (0);
 }
 
-// int	if_char(char const *str, char *charset)
-// {
-// 	int	i;
+int	check_dq_flag(int flag)
+{
+	int	i;
 
-// 	i = 0;
-// 	while (str[i] != '\0' && !(check(str[i], charset)))
-// 		i++;
-// 	return (i);
-// }
+	i = flag;
+	if (i == 1)
+		i = 0;
+	else
+		i = 1;
+	return (i);
+}
 
 int	if_char(char const *str, char *charset)
 {
-	int		i;
+	int	i;
 	int	q_flag;
 	int	dq_flag;
 
@@ -51,24 +31,15 @@ int	if_char(char const *str, char *charset)
 	dq_flag = 0;
 	i = 0;
 	(void)charset;
-	while(str[i] != '\0')
+	while (str[i] != '\0')
 	{
-		if ((str[i - 1] != '\\' && str[i] == '\"') || (str[i - 1] != '\\' && str[i] == '\''))
+		if ((str[i - 1] != '\\' && str[i] == '\"')
+			|| (str[i - 1] != '\\' && str[i] == '\''))
 		{
 			if (str[i] == '\"' && q_flag == 0)
-			{
-				if (dq_flag == 1)
-					dq_flag = 0;
-				else
-					dq_flag = 1;
-			}
+				dq_flag = check_dq_flag(dq_flag);
 			else if (str[i] == '\'' && dq_flag == 0)
-			{
-				if (q_flag == 1)
-					q_flag = 0;
-				else
-					q_flag = 1;
-			}
+				q_flag = check_dq_flag(q_flag);
 		}
 		if (q_flag == 0 && dq_flag == 0 && str[i] == ' ')
 			break;
@@ -279,42 +250,45 @@ void assign_parse (t_data *data)
 			assign_norm(&curr);
 		curr = curr->next;
 	}
-	// t_arg *head = data->cmd;
-	// while(head != NULL) 
-	// {
-	// 	printf("this is final :%s %d\n", head->ac, head->type);
-	// 	head = head->next;
-	// }
+
 	replace_ds_parse(data);
-	// replace_parse (data);
+	replace_parse (data);
+}
+
+int total_path_len(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] != ' ' && str[i] != '\0' 
+		&& str[i] != '\"' && str[i] != '\'' && str[i] != '$')
+	i++;
+
+	return (i);
 }
 
 char *get_path(char *str)
 {
 	int			i;
 	int			j;
-	int			k;
 	char	*temp;
 
 	temp = NULL;
 	i = 0;
 	j = 0;
-	k = 0;
 	while(str[i] != '\0')
 	{
 		if (str[i] == '$')
 		{
 			i++;
-			while (str[i + j] != ' ' && str[i + j] != '\0' 
-					&& str[i + j] != '\"' && str[i + j] != '\'')
-				j++;
-			temp = malloc(sizeof(char) * (j + 1));
-			while (k != j)
+			temp = malloc(sizeof(char) * (total_path_len(&str[i]) + 1));
+			while (j != total_path_len(&str[i]))
 			{
-				temp[k] = str[i + k];
-				k++;
+				temp[j] = str[i + j];
+				j++;
 			}
-			temp[k] = '\0';
+			temp[j] = '\0';
+			printf("%s\n", temp);
 			break;
 		}
 		i++;
@@ -364,6 +338,7 @@ char *get_full_path(char *str, t_data *data)
 	temp = malloc(sizeof(char) * (get_temp_size(&data->envp[i][j]) + 1));
 	while (data->envp[i][j] != '\0')
 		temp[k++] = data->envp[i][j++];
+	temp[k] = '\0';
 	return (temp);
 }
 
@@ -389,6 +364,7 @@ char *replace_dollar_sign(char *st, t_data *data)
 			{
 				temp = get_path(st);
 				temp2 = get_full_path(temp, data);
+				free(temp);
 				return (temp2);
 			}
 		}
@@ -404,7 +380,7 @@ void replace_ds_parse(t_data *data)
 	char	*temp;
 	char	*temp2;
 	char	*str;
-	int			i;
+	int		i;
 
 
 	curr = data->cmd;
@@ -417,30 +393,18 @@ void replace_ds_parse(t_data *data)
 	{
 		flag = 0;
 		i = 0;
-		while(curr->ac[i] != '\0')
+		while (curr->ac[i] != '\0')
 		{
-			if (curr->ac[i] == '\"' && flag != 2)
-			{
-				if (flag == 1)
-					flag = 0;
-				else
-					flag = 1;
-			}
-			if (curr->ac[i] == '\'' && flag != 1)
-			{
-				if (flag == 2)
-					flag = 0;
-				else
-					flag = 2;
-			}
+			flag = check_flag(flag, &curr->ac[i]);
 			if (curr->ac[i] == '$' && flag != 2)
-			{
+			{   
 				temp2 = replace_dollar_sign(&curr->ac[i], data);
 				temp = ft_strjoin_normal(str, temp2);
 				free(str);
 				free(temp2);
 				str = temp;
-				while (curr->ac[i] != '\"' && curr->ac[i] != '\'' && curr->ac[i] != '\0' && curr->ac[i] != ' ')
+				i++;
+				while (curr->ac[i] != '\"' && curr->ac[i] != '\'' && curr->ac[i] != '\0' && curr->ac[i] != ' ' && curr->ac[i] != '$')
 					i++;
 			}
 			else
@@ -457,12 +421,12 @@ void replace_ds_parse(t_data *data)
 		str = NULL;
 		curr = curr->next;
 	}
-	t_arg *hed = data->cmd;
-	while(hed != NULL) 
-	{
-		printf("%s\n", hed->ac);
-		hed = hed->next;
-	}
+	// t_arg *hed = data->cmd;
+	// while(hed != NULL) 
+	// {
+	// 	printf("%s\n", hed->ac);
+	// 	hed = hed->next;
+	// }
 	// printf("%s\n", curr->ac);
 }
 
@@ -544,7 +508,7 @@ int get_temp_size(char *str)
 	return (j);
 }
 
-void replace_parse(t_data *data)
+void  replace_parse(t_data *data)
 {
 	int			i;
 	int			j;
@@ -597,35 +561,6 @@ void replace_parse(t_data *data)
 		hed = hed->next;
 	}
 }
-
-// int get_red_total(char *ch)
-// {
-// 	int		i;
-// 	int		j;
-// 	int	flag;
-
-// 	i = 0;
-// 	j = 0;
-// 	flag = 0;
-// 	while (ch[i] != '\0')
-// 	{
-// 		if (ch[i] == '\"' && flag != 2)
-// 		{
-// 			if (flag == 1)
-// 				flag = 0;
-// 			else
-// 				flag = 1;
-// 		}
-// 		if (ch[i] == '\'' && flag != 1)
-// 		{
-// 			if (flag == 2)
-// 				flag = 0;
-// 			else
-// 				flag = 2;
-// 		}
-// 		if ((check_pipe(ch[i] == 0) || )
-// 	}
-// }
 
 int check_flag(int flag, char *str)
 {
@@ -681,7 +616,6 @@ int	ft_find_red(char *str)
 		}
 		i++;
 	}
-	printf("%d\n", j);
 	return (j);
 }
 
@@ -695,29 +629,23 @@ void before_parse(char *ch, t_data *data)
 	i = 0;
 	j = 0;
 	flag = 0;
-	(void)data;
 	temp = malloc(sizeof(char) * (ft_charlen(ch) + ft_find_red(ch)) + 1);
-
 	while (ch[i] != '\0')
 	{
 		flag = check_flag(flag, &ch[i]);
 		if ((ch[i] == '|' || ch[i] == '<' || ch[i] == '>' || ch[i] == ';') && flag == 0)
 		{
-			temp[j] = ' ';
-			j++;
+			printf("%d\n", flag);			
+			temp[j++] = ' ';
 			if (ch[i + 1] != '\0' && ((ch[i] == '<' && ch[i + 1] == '<') || (ch[i] == '>' && ch[i + 1] == '>')))
 			{
 				temp[j++] = ch[i + 1];
-				printf("%c\n", ch[i + 1]);
 				i++;
 				temp[j++] = ch[i];
-				printf("%c\n", ch[i + 1]);
 				i++;
 			}
 		}
-		temp[j] = ch[i];
-		j++;
-		i++;
+		temp[j++] = ch[i++];
 	}
 	temp[j] = '\0';
 	parse(temp, data);
@@ -743,15 +671,8 @@ void parse(char *ch, t_data *data)
 		else if (ch[i] == '\"' || ch[i] == '\'')
 			i += (add_back_1(&head, &ch[i]));
 	}
-	i = 0;
-	while(head != NULL) 
-	{
-		printf("this is final : %s %d\n", head->ac, i);
-		head = head->next;
-		i++;
-	}
-	// data->cmd = head;
-	// assign_parse (data);
+	data->cmd = head;
+	assign_parse (data);
 }
 
 void before_init(void)
@@ -806,4 +727,3 @@ int	main(int argc, char *argv[], char **envp)
 	tcsetattr(STDIN_FILENO, TCSANOW, &terminal);
 	return (0);
 }
-

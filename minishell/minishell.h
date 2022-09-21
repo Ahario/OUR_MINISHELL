@@ -44,4 +44,7 @@ char *replace_dollar_sign(char *str, t_data *data);
 void replace_parse(t_data *data);
 int get_temp_size(char *str);
 void parse(char *ch, t_data *data);
+int check_flag(int flag, char *str);
+int totla_path_len(char *str);
+
 #endif
