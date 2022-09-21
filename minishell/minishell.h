@@ -19,10 +19,12 @@ typedef struct s_arg{
 }	t_arg;
 
 typedef struct s_data{
-	t_arg	*cmd;
-	int		argc;
-	char	**argv;
-	char	**envp;
+	t_arg			*cmd;
+	int				argc;
+	char			**argv;
+	char			**envp;
+	struct s_data	*next;
+	struct s_data	*prev;
 }	t_data;
 
 
@@ -37,5 +39,9 @@ void	before_init(void);
 void	ft_signal(void);
 void	ft_exit(void);
 
+void replace_ds_parse(t_data *data);
+char *replace_dollar_sign(char *str, t_data *data);
 void replace_parse(t_data *data);
+int get_temp_size(char *str);
+void parse(char *ch, t_data *data);
 #endif
