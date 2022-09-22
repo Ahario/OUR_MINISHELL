@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/21 12:51:40 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/22 19:18:36 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/22 20:00:53 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,10 @@ void	last_cmd(t_data *data)
 	{
 		cmd = ft_executable(data);
 		arg = ft_arg_split(data->cmd);
-		execve(cmd, arg, data->envp);
+		ret = execve(cmd, arg, data->envp);
 		free(cmd);
 		close(data->pipe[1]);
 		close(data->pipe[0]);
-		ret = 1;
 	}
 //	sleep(10);
 	ft_redirect_restore(data, 1);
@@ -87,10 +86,9 @@ void	first_cmd(t_data *data)
 	{
 		cmd = ft_executable(data);
 		arg = ft_arg_split(data->cmd);
-		execve(cmd, arg, data->envp);
+		ret = execve(cmd, arg, data->envp);
 		free(cmd);
 		close(data->prev->pipe[1]);
-		ret = 1;
 	}
 	close(data->pipe[1]);
 	close(data->pipe[0]);
@@ -124,7 +122,6 @@ void	child_cmd(t_data *data)
 		execve(cmd, arg, data->envp);
 		free(cmd);
 		close(data->prev->pipe[0]);
-		ret = 1;
 	}
 	close(data->pipe[1]);
 	close(data->pipe[0]);
@@ -141,7 +138,7 @@ void	ft_pipe_cmd(t_data *data)
 //	int	**pipe;
 
 	tem = data;
-	check = WNOWAIT;
+	check = 0;
 //	pipe = pipe_char(data);
 	while (tem)
 	{
@@ -174,7 +171,11 @@ void	ft_pipe_cmd(t_data *data)
 			close(tem->pipe[1]);
 			waitpid(pid, &check, 0);
 			if (!tem->next)
+			{
+				g_exit_number = WEXITSTATUS(check);
+				printf ("exit_n %d\n", g_exit_number);
 				break;
+			}
 			tem = tem->next;
 		}
 	}
@@ -187,7 +188,8 @@ void	ft_pipe_set(t_data *data, t_data *new)
 	int	*fd;
 
 	fd = malloc(sizeof(int) * 2);
-	pipe(fd);
+	if(pipe(fd) == -1)
+		error_message("PIPE ERROR \n");
 	data->pipe = fd;
 	new->pipe = fd;
 	data->fd_out = fd[1];

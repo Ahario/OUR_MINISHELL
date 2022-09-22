@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/30 14:05:56 by sunglee           #+#    #+#             */
-/*   Updated: 2022/08/30 17:19:34 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/22 19:22:46 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "libft/libft.h"
@@ -35,6 +35,7 @@ void	error_message(char *str)
 {
 	rl_replace_line("", 1);
 	printf ("%s", str);
+	g_exit_number = 127;
 }
 
 void	ft_exit(t_arg *head)

@@ -40,6 +40,8 @@ enum	e_pars{
     RDRT, DRGT
 };
 
+int	g_exit_number;
+
 void replace_ds_parse(t_data *data);
 char *replace_dollar_sign(char *str, t_data *data);
 void replace_parse(t_data *data);

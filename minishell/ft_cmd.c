@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 14:46:05 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/22 17:34:00 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/22 19:48:48 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,6 +178,7 @@ void	ft_one_cmd(t_data *data)
 	{
 		free(cmd);
 		waitpid(pid, &ret, 0);
+		g_exit_number = WEXITSTATUS(ret);
 	}
 }
 
@@ -195,7 +196,7 @@ void	ft_cmd_start(t_data *data)
 	ft_signal_cmd();
 	if (!data->next)
 	{
-		printf ("test~~~~~~~~\n");
+//		printf ("test~~~~~~~~\n");
 //		printf ("cmd_head_point %p\n", data);
 //		printf ("cmd_head_cmd %s\n", data->cmd->ac);
 //		printf ("cmd_head_export %s\n", data->envp[0]);

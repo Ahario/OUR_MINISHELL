@@ -6,11 +6,12 @@
 /*   By: hyeo <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 13:15:32 by hyeo              #+#    #+#             */
-/*   Updated: 2022/09/22 20:16:23 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/22 19:24:07 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
 
 	// t_arg *hed = data->cmd;
 	// while(hed != NULL) 
@@ -18,6 +19,13 @@
 	// 	printf("%s\n", hed->ac);
 	// 	hed = hed->next;
 	// }
+
+/*int	check(char const str, char *charset)
+{
+	if (str == charset[0])
+		return (1);
+	return (0);
+}*/
 
 int	check_dq_flag(int flag)
 {
@@ -129,8 +137,7 @@ void play_built(t_data *data, char *str)
 	return ;
 }
 
-
-int	check_built(t_data *data, char *str)
+int check_built(t_data *data, char *str)
 {
 	(void)data;
 	if (ft_strncmp(str, "echo", ft_strlen(str)) == 0)
@@ -138,6 +145,8 @@ int	check_built(t_data *data, char *str)
 	else if (ft_strncmp(str, "cd", ft_strlen(str)) == 0)
 		return (0);
 	else if (ft_strncmp(str, "pwd", ft_strlen(str)) == 0)
+		return (0);
+	else if (ft_strncmp(str, "export", ft_strlen(str)) == 0)
 		return (0);
 	else if (ft_strncmp(str, "unset", ft_strlen(str)) == 0)
 		return (0);
@@ -147,6 +156,7 @@ int	check_built(t_data *data, char *str)
 		return (0);
 	return (1);
 }
+
 
 int	check_q(char *str)
 {
@@ -261,12 +271,13 @@ void	assign_norm(t_arg **head)
 	curr->type = NORM;
 }
 
-void	assign_parse(t_data *data)
+void	assign_parse (t_data *data)
 {
 	t_arg	*curr;
 
 	curr = data->cmd;
-	while (curr != NULL)
+
+	while(curr != NULL)
 	{
 		if (check_q(curr->ac) == 0)
 			assign_q(&curr);
@@ -281,30 +292,31 @@ void	assign_parse(t_data *data)
 		curr = curr->next;
 	}
 	replace_ds_parse(data);
-	replace_parse(data);
+	replace_parse (data);
 }
 
-int	total_path_len(char *str)
+int total_path_len(char *str)
 {
 	int	i;
 
 	i = 0;
-	while (str[i] != ' ' && str[i] != '\0'
+	while (str[i] != ' ' && str[i] != '\0' 
 		&& str[i] != '\"' && str[i] != '\'' && str[i] != '$')
-	i++;
+		i++;
+
 	return (i);
 }
 
-char	*get_path(char *str)
+char *get_path(char *str)
 {
-	int		i;
-	int		j;
+	int			i;
+	int			j;
 	char	*temp;
 
 	temp = NULL;
 	i = 0;
 	j = 0;
-	while (str[i] != '\0')
+	while(str[i] != '\0')
 	{
 		if (str[i] == '$')
 		{
@@ -316,19 +328,19 @@ char	*get_path(char *str)
 				j++;
 			}
 			temp[j] = '\0';
-			break ;
+			break;
 		}
 		i++;
 	}
 	return (temp);
 }
 
-int	search_mini_path(int j, char *envp[], char *str)
+int search_mini_path(int j, char *envp[], char *str)
 {
 	int	i;
 
 	i = 0;
-	while (envp[j][i] == str[i])
+	while(envp[j][i] == str[i])
 	{
 		if (str[i] == envp[j][i])
 			i++;
@@ -340,18 +352,18 @@ int	search_mini_path(int j, char *envp[], char *str)
 	return (1);
 }
 
-char	*get_full_path(char *str, t_data *data)
+char *get_full_path(char *str, t_data *data)
 {
-	int		i;
-	int		j;
-	int		k;
+	int			i;
+	int			j;
+	int			k;
 	char	*temp;
 
 	i = 0;
 	j = 0;
 	k = 0;
 	temp = NULL;
-	while (data->envp[i] != NULL && search_mini_path(i, data->envp, str))
+	while(data->envp[i] != NULL && search_mini_path(i, data->envp, str))
 		i++;
 	if (data->envp[i] == NULL)
 	{
@@ -359,7 +371,7 @@ char	*get_full_path(char *str, t_data *data)
 		temp[0] = '\0';
 		return (temp);
 	}
-	while (data->envp[i][j] != '=')
+	while(data->envp[i][j] != '=')
 		j++;
 	j++;
 	temp = malloc(sizeof(char) * (get_temp_size(&data->envp[i][j]) + 1));
@@ -369,13 +381,13 @@ char	*get_full_path(char *str, t_data *data)
 	return (temp);
 }
 
-char	*replace_dollar_sign(char *st, t_data *data)
+char *replace_dollar_sign(char *st, t_data *data)
 {
 	char	*temp;
 	char	*temp2;
-	int		i;
+	int			i;
 
-	temp = NULL;
+	temp = NULL; 
 	temp2 = NULL;
 	i = 0;
 	while (st[i] != '\0')
@@ -397,27 +409,10 @@ char	*replace_dollar_sign(char *st, t_data *data)
 	return (NULL);
 }
 
-int	for_before_r_ds_parse(char *c)
-{
-	int	i;
-
-	i = 0;
-	if (c[i] != '\"' && c[i] != '\'' && c[i] != '\0'
-		&& c[i] != ' ' && c[i] != '$')
-		return (0);
-	return (1);
-}
-
-void	increase_both(int *i, int *j)
-{
-	*i += 1;
-	*j += 1;
-}
-
 int	before_r_ds_parse(char *str, t_data *data)
 {
-	int		i;
-	int		j;
+	int			i;
+	int			j;
 	int		flag;
 	char	*temp;
 
@@ -434,179 +429,164 @@ int	before_r_ds_parse(char *str, t_data *data)
 			j += ft_charlen(temp);
 			temp = NULL;
 			i++;
-			while (for_before_r_ds_parse(&str[i]) == 0)
+			while (str[i] != '\"' && str[i] != '\'' && str[i] != '\0' && str[i] != ' ' && str[i] != '$')
 				i++;
 		}
 		else
-			increase_both(&i, &j);
+		{
+			j++;
+			i++;
+		}
 	}
 	return (j);
 }
 
-int	for_replace_ds_parse(char *c)
-{
-	int	i;
-
-	i = 0;
-	if (c[i] != '\"' && c[i] != '\'' && c[i] != '\0'
-		&& c[i] != ' ' && c[i] != '$')
-		return (0);
-	return (1);
-}
-
-// char *if_replace_ds_parse(char *curr, int flag, int *i, )
+// void replace_ds_parse(t_data *data)
 // {
+// 	int		flag;
+// 	t_arg	*curr;
+// 	char	*temp;
+// 	char	*temp2;
+// 	int		i;
+// 	int		j;
+// 	int		k;
+// 	int		l;
 
+
+// 	curr = data->cmd;
+// 	temp = NULL;
+// 	temp2 = NULL;
+// 	i = 0;
+// 	k = 0;
+// 	l = 0;
+// 	flag = 0;
+// 	j = 0;
+// 	while (curr != NULL)
+// 	{
+// 		flag = 0;
+// 		i = 0;
+// 		k = 0;
+// 		j = 0;
+// 		temp = malloc(sizeof(char) * ((before_r_ds_parse(curr->ac, data)) + 1));
+// 		while (curr->ac[i] != '\0')
+// 		{
+// 			flag = check_flag(flag, &curr->ac[i]);
+// 			if (curr->ac[i] == '$' && flag != 2)
+// 			{
+// 				l = 0;
+// 				temp2 = replace_dollar_sign(&curr->ac[i], data);
+// 				while (temp2[l] != '\0')
+// 					temp[k++] = temp2[l++];
+// 				free(temp2);
+// 				i++;
+// 				while (curr->ac[i] != '\"' && curr->ac[i] != '\'' && curr->ac[i] != '\0' && curr->ac[i] != ' ' && curr->ac[i] != '$')
+// 					i++;
+// 			}
+// 			else
+// 				temp[k++] = curr->ac[i++];
+// 		}
+// 		temp[k] = '\0';
+// 		free(curr->ac);
+// 		curr->ac = temp;
+// 		temp = NULL;
+// 		curr = curr->next;
+// 	}
 // }
 
-// int	before_r_ds_parse(char *str, t_data *data)
+// char *replace_ds_parse(char *str, t_data *data)
 // {
-// 	int			i;
-// 	int			j;
 // 	int		flag;
 // 	char	*temp;
+// 	char	*temp2;
+// 	char	*ch;
+// 	int		i;
 
+
+// 	temp = NULL; 
+// 	temp2 = NULL;
+// 	str = NULL;
 // 	i = 0;
-// 	j = 1;
 // 	flag = 0;
-// 	temp = NULL;
 // 	while (str[i] != '\0')
 // 	{
 // 		flag = check_flag(flag, &str[i]);
 // 		if (str[i] == '$' && flag != 2)
-// 		{
-// 			temp = replace_dollar_sign(&str[i], data);
-// 			j += ft_charlen(temp);
-// 			temp = NULL;
+// 		{   
+// 			temp2 = replace_dollar_sign(str[i], data);
+// 			temp = ft_strjoin_normal(ch, temp2);
+// 			free(ch);
+// 			free(temp2);
+// 			ch = temp;
 // 			i++;
 // 			while (str[i] != '\"' && str[i] != '\'' && str[i] != '\0' && str[i] != ' ' && str[i] != '$')
 // 				i++;
 // 		}
 // 		else
-// 		{
-// 			j++;
+// 		{	
+// 			temp = ft_strjoin(ch, &str[i]);
+// 			free(ch);
+// 			ch = temp;
 // 			i++;
 // 		}
 // 	}
-// 	return (j);
+// 	free(str);
+// 	return (str);
 // }
-
-void	reset_replace_ds_parse(int *flag, int *i, int *k)
-{
-	*flag = 0;
-	*i = 0;
-	*k = 0;
-}
-
-void	if_replace_ds_parse(int *k, char *c, char *t, t_data *data)
-{
-	int		i;
-	int		j;
-	char	*temp2;
-
-	i = 0;
-	j = 0;
-	temp2 = replace_dollar_sign(&c[i], data);
-	while (temp2[i] != '\0')
-	{
-		t[j++] = temp2[i++];
-	}
-	free(temp2);
-	*k += j;
-}
 
 void replace_ds_parse(t_data *data)
 {
 	int		flag;
 	t_arg	*curr;
 	char	*temp;
+	char	*temp2;
+	char	*str;
 	int		i;
-	int		k;
+
 
 	curr = data->cmd;
-	temp = NULL;
+	temp = NULL; 
+	temp2 = NULL;
+	str = NULL;
 	i = 0;
-	k = 0;
 	flag = 0;
 	while (curr != NULL)
 	{
-		reset_replace_ds_parse(&flag, &i, &k);
-		temp = malloc(sizeof(char) * ((before_r_ds_parse(curr->ac, data)) + 1));
+		flag = 0;
+		i = 0;
 		while (curr->ac[i] != '\0')
 		{
 			flag = check_flag(flag, &curr->ac[i]);
 			if (curr->ac[i] == '$' && flag != 2)
-			{
-				if_replace_ds_parse(&k, &curr->ac[i], &temp[k], data);
+			{   
+				temp2 = replace_dollar_sign(&curr->ac[i], data);
+				temp = ft_strjoin_normal(str, temp2);
+				free(str);
+				free(temp2);
+				str = temp;
 				i++;
-				while (for_replace_ds_parse(&curr->ac[i]) == 0)
+				while (curr->ac[i] != '\"' && curr->ac[i] != '\'' && curr->ac[i] != '\0' && curr->ac[i] != ' ' && curr->ac[i] != '$')
 					i++;
 			}
 			else
-				temp[k++] = curr->ac[i++];
+			{	
+				temp = ft_strjoin(str, &curr->ac[i]);
+				free(str);
+				str = temp;
+				i++;
+			}
 		}
-		temp[k] = '\0';
 		free(curr->ac);
 		curr->ac = temp;
 		temp = NULL;
+		str = NULL;
 		curr = curr->next;
 	}
 }
 
-
-// void	replace_ds_parse(t_data *data)
-// {
-// 	int		flag;
-// 	t_arg	*curr;
-// 	char	*temp;
-// 	char	*temp2;
-// 	char	*str;
-// 	int		i;
-
-// 	curr = data->cmd;
-// 	temp = NULL;
-// 	temp2 = NULL;
-// 	str = NULL;
-// 	i = 0;
-// 	flag = 0;
-// 	while (curr != NULL)
-// 	{
-// 		flag = 0;
-// 		i = 0;
-// 		while (curr->ac[i] != '\0')
-// 		{
-// 			flag = check_flag(flag, &curr->ac[i]);
-// 			if (curr->ac[i] == '$' && flag != 2)
-// 			{
-// 				temp2 = replace_dollar_sign(&curr->ac[i], data);
-// 				temp = ft_strjoin_normal(str, temp2);
-// 				free(str);
-// 				free(temp2);
-// 				str = temp;
-// 				i++;
-// 				while (for_replace_ds_parse(&curr->ac[i]) == 0)
-// 					i++;
-// 			}
-// 			else
-// 			{	
-// 				temp = ft_strjoin(str, &curr->ac[i]);
-// 				free(str);
-// 				str = temp;
-// 				i++;
-// 			}
-// 		}
-// 		free(curr->ac);
-// 		curr->ac = temp;
-// 		temp = NULL;
-// 		str = NULL;
-// 		curr = curr->next;
-// 	}
-// }
-
-char	*ft_strcpy_hth(char *str, int here, int there)
+char *ft_strcpy_hth(char *str, int here, int there)
 {
-	int		i;
-	int		j;
+	int			i;
+	int			j;
 	char	*temp;
 
 	i = here;
@@ -652,10 +632,10 @@ char	*ft_strcpy_hth(char *str, int here, int there)
 // 	return (i - j);
 // }
 
-int	get_temp_size(char *str)
+int get_temp_size(char *str)
 {
-	int		i;
-	int		j;
+	int			i;
+	int			j;
 	char	charset;
 
 	i = 0;
@@ -710,39 +690,13 @@ int	get_temp_size(char *str)
 // 	return (temp);
 // }
 
-void	if_replace_parse(char *str, char *temp, int *i, int *j)
+
+void  replace_parse(t_data *data)
 {
-	int		k;
-	int		l;
+	int			i;
+	int			j;
+	char	*temp;
 	char	charset;
-
-	k = 0;
-	l = 0;
-	charset = str[k];
-	k++;
-	while (str[k] != charset && str[k] != '\0')
-		temp[l++] = str[k++];
-	if (str[k] != '\0')
-		k++;
-	*i += k;
-	*j += l;
-}
-
-char	*reset_replace_parse(int *i, int *j, char *str)
-{
-	char	*temp;
-
-	temp = malloc(sizeof(char) * (get_temp_size(str) + 1));
-	*i = 0;
-	*j = 0;
-	return (temp);
-}
-
-void	replace_parse(t_data *data)
-{
-	int		i;
-	int		j;
-	char	*temp;
 	t_arg	*curr;
 
 	i = 0;
@@ -751,11 +705,21 @@ void	replace_parse(t_data *data)
 	curr = data->cmd;
 	while (curr != NULL)
 	{
-		temp = (reset_replace_parse(&i, &j, curr->ac));
+		j = get_temp_size(curr->ac);
+		temp = malloc(sizeof(char) * (j + 1));
+		j = 0;
+		i = 0;
 		while (curr->ac[i] != '\0')
 		{
 			if (curr->ac[i] == '\'' || curr->ac[i] == '\"')
-				if_replace_parse(&curr->ac[i], &temp[j], &i, &j);
+			{
+				charset = curr->ac[i];
+				i++;
+				while (curr->ac[i] != charset && curr->ac[i] != '\0')
+					temp[j++] = curr->ac[i++];
+				if (curr->ac[i] != '\0')
+					i++;
+			}
 			else
 				temp[j++] = curr->ac[i++];
 		}
@@ -765,15 +729,9 @@ void	replace_parse(t_data *data)
 		temp = NULL;
 		curr = curr->next;
 	}
-	t_arg *hed = data->cmd;
-	while(hed != NULL) 
-	{
-		printf("%s\n", hed->ac);
-		hed = hed->next;
-	}
 }
 
-int	check_flag(int flag, char *str)
+int check_flag(int flag, char *str)
 {
 	int	i;
 
@@ -795,7 +753,7 @@ int	check_flag(int flag, char *str)
 	return (i);
 }
 
-int	ft_charlen(char *str)
+int ft_charlen(char *str)
 {
 	int	i;
 
@@ -805,24 +763,12 @@ int	ft_charlen(char *str)
 	return (i);
 }
 
-int	for_ft_find_red(char *c, int f)
-{
-	int	i;
-
-	i = f - 1;
-	if (f > 0)
-	{
-		if ((c[i] == '<' && c[f] == '<') || (c[f] == '>' && c[f] == '>'))
-			return (0);
-	}
-	return (1);
-}
-
 int	ft_find_red(char *str)
 {
-	int	i;
-	int	j;
+	int		i;
+	int		j;
 	int	flag;
+
 
 	i = 0;
 	j = 0;
@@ -832,7 +778,7 @@ int	ft_find_red(char *str)
 		flag = check_flag(flag, &str[i]);
 		if ((str[i] == '|' || str[i] == '<' || str[i] == '>' ) && flag == 0)
 		{
-			if (for_ft_find_red(str, i) == 0)
+			if (i > 0 && ((str[i - 1] == '<' && str[i] == '<') || (str[i - 1] == '>' && str[i] == '>')))
 				i++;
 			else
 				j++;
@@ -842,66 +788,10 @@ int	ft_find_red(char *str)
 	return (j);
 }
 
- int		check_parse(char *ch, t_data *data)
- {
- 	int	i;
- 	int	flag;
-
- 	i = 0;
- 	flag = 0;
-	(void)data;
- 	while (ch[i] != '\0')
- 	{
- 		if (ch[i] != ' ')
- 		{
- 			flag = 1;
- 			break;
- 		}
- 		i++;
- 	}
- 	return (flag);
- }
-
-void	increase_temp(char *temp, char *ch, int *k, int *l)
+void before_parse(char *ch, t_data *data)
 {
-	int	i;
-	int	j;
-
-	i = 0;
-	j = 0;
-	temp[j++] = ch[++i];
-	temp[j++] = ch[i++];
-	*l += 2;
-	*k += 2;
-}
-
-int	for_red(char *c, int f)
-{
-	int	i;
-
-	i = 0;
-	if ((c[i] == '|' || c[i] == '<' || c[i] == '>') && f == 0)
-		return (0);
-	return (1);
-}
-
-int	for_d_red(char *c)
-{
-	int	i;
-	int	j;
-
-	i = 0;
-	j = 1;
-	if (c[j] != '\0' && ((c[i] == '<' && c[j] == '<')
-			|| (c[i] == '>' && c[j] == '>')))
-		return (0);
-	return (1);
-}
-
-void	before_parse(char *ch, t_data *data)
-{
-	int		i;
-	int		j;
+	int			i;
+	int			j;
 	int		flag;
 	char	*temp;
 
@@ -912,40 +802,37 @@ void	before_parse(char *ch, t_data *data)
 	while (ch[i] != '\0')
 	{
 		flag = check_flag(flag, &ch[i]);
-		if (for_red(&ch[i], flag) == 0)
+		if ((ch[i] == '|' || ch[i] == '<' || ch[i] == '>' || ch[i] == ';') && flag == 0)
 		{		
 			temp[j++] = ' ';
-			if (for_d_red(&ch[i]) == 0)
-				increase_temp(&temp[j], &ch[i], &i, &j);
+			if (ch[i + 1] != '\0' && ((ch[i] == '<' && ch[i + 1] == '<') || (ch[i] == '>' && ch[i + 1] == '>')))
+			{
+				temp[j++] = ch[++i];
+				temp[j++] = ch[i++];
+			}
 		}
 		temp[j++] = ch[i++];
-		if (i > 0 && ch[i - 1] == '|')
-			temp[j++] = ' ';
 	}
 	temp[j] = '\0';
 	parse(temp, data);
 }
 
-void	parse(char *ch, t_data *data)
+void parse(char *ch, t_data *data)
 {
-	int		i;
+	int			i;
 	t_arg	*head;
-
+ 
 	i = 0;
 	head = NULL;
 	data->argc = ft_strlen(ch);
 	while (ch[i] != '\0')
 	{
-		if ((ch[i] != '\'' && ch[i] != '\"')
-			|| (ch[i] == '\"' || ch[i] == '\''))
+		if ((ch[i] != '\'' && ch[i] != '\"') || (ch[i] == '\"' || ch[i] == '\''))
 		{
 			while (ch[i] == ' ')
 				i++;
-			if (ch[i] != '\0')
-			{
-				add_back(&head, &ch[i]);
-				i += (if_char(&ch[i], " "));
-			}
+			add_back(&head, &ch[i]);
+			i += (if_char(&ch[i], " "));
 		}
 	}
 	data->cmd = head;
@@ -953,7 +840,7 @@ void	parse(char *ch, t_data *data)
 	assign_parse (data);
 }
 
-void	before_init(void)
+void before_init(void)
 {
 	struct termios	change;
 
@@ -962,7 +849,6 @@ void	before_init(void)
 	tcsetattr(STDIN_FILENO, TCSANOW, &change);
 	g_exit_number = 0;
 }
-
 
 void	ft_set_data(t_data *data)
 {
@@ -991,6 +877,7 @@ void	clean_all(t_data *data)
 }
 
 
+
 char	**ft_malloc_envp(char **envp)
 {
 	int		i;
@@ -1009,8 +896,7 @@ char	**ft_malloc_envp(char **envp)
 	return (ret);
 }
 
-
-int	main(int argc, char *argv[], char **envp)
+int	main(int argc, char *argv[], char **envp) 
 {
 	t_data			*data;
 	struct termios	terminal;
@@ -1024,17 +910,15 @@ int	main(int argc, char *argv[], char **envp)
 	ft_set_data(data);
 	data->envp = ft_malloc_envp(envp);
 	ft_signal();
-	while (1)
+	while(1)
 	{
 		ch = readline("MINISHELL./ ");
 		if (ch)
 		{
-			if (check_parse(ch, data))
-			{
-				before_parse(ch, data);
-				if(!ft_redir(data))
-					ft_cmd_start(data);
-			}
+			before_parse(ch, data);
+		//	printf ("AAAAAAA\n");
+			if(!ft_redir(data))
+				ft_cmd_start(data);
 		}
 		else if (!ch)
 			exit_C_d();

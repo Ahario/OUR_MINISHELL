@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 12:04:06 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/22 18:35:16 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/22 19:27:58 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ int	infilename_check(t_data *data, char *str, int *i, int flag)
 		return (1);
 	while (size >= 0)
 		filename[size--] = str[j--];
-	printf("%s\n", filename);
+//	printf("%s\n", filename);
 	if (ft_open_flag(data, filename, flag) == -1)
 	{
 		error_message("MINISHELL: ");
@@ -263,7 +263,7 @@ int	ft_redir(t_data *data)
 			break;
 		data = data->next;
 	}
-	printf ("~~~~~~~~~\n");
+//	printf ("~~~~~~~~~\n");
 	while (data->prev)
 		data = data->prev;
 	return (0);
