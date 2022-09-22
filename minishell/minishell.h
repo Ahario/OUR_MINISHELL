@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hyeo <marvin@42.fr>                        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/09/22 13:15:40 by hyeo              #+#    #+#             */
+/*   Updated: 2022/09/22 13:15:44 by hyeo             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -46,5 +58,6 @@ int get_temp_size(char *str);
 void parse(char *ch, t_data *data);
 int check_flag(int flag, char *str);
 int totla_path_len(char *str);
+int ft_charlen(char *str);
 
 #endif

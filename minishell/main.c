@@ -1,6 +1,25 @@
- #include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hyeo <marvin@42.fr>                        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/09/22 13:15:32 by hyeo              #+#    #+#             */
+/*   Updated: 2022/09/22 13:15:33 by hyeo             ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
 
 int	exit_number;
+
+	// t_arg *hed = data->cmd;
+	// while(hed != NULL) 
+	// {
+	// 	printf("%s\n", hed->ac);
+	// 	hed = hed->next;
+	// }
 
 int	check(char const str, char *charset)
 {
@@ -42,45 +61,45 @@ int	if_char(char const *str, char *charset)
 				q_flag = check_dq_flag(q_flag);
 		}
 		if (q_flag == 0 && dq_flag == 0 && str[i] == ' ')
-			break;
+			break ;
 		i++;
 	}
 	return (i);
 }
 
-int add_back_1(t_arg **head, char *ch)
-{
-	t_arg	*curr;
-	t_arg	*new;
-	int 		i;
+// int add_back_1(t_arg **head, char *ch)
+// {
+// 	t_arg	*curr;
+// 	t_arg	*new;
+// 	int 		i;
 
-	i = 0;
-	curr = *head;
-	while (ch[i] != '\0')
-	{
-		i++;
-		if ((ch[i] == ch[0] && ch[i - 1] != '\\'))
-		{
-			i++;
-			break;
-		}
-	}
-	new = malloc(sizeof(t_arg) * 1);
-	new->ac = malloc(sizeof(char) * (i + 1));
-	ft_strlcpy(new->ac, ch, (i + 1));
-	new->next = NULL;
-	if (*head == NULL)
-		*head = new;
-	else
-	{
-		while(curr->next != NULL)
-			curr = curr->next;
-		curr->next = new;
-	}
-	return (i);
-}
+// 	i = 0;
+// 	curr = *head;
+// 	while (ch[i] != '\0')
+// 	{
+// 		i++;
+// 		if ((ch[i] == ch[0] && ch[i - 1] != '\\'))
+// 		{
+// 			i++;
+// 			break;
+// 		}
+// 	}
+// 	new = malloc(sizeof(t_arg) * 1);
+// 	new->ac = malloc(sizeof(char) * (i + 1));
+// 	ft_strlcpy(new->ac, ch, (i + 1));
+// 	new->next = NULL;
+// 	if (*head == NULL)
+// 		*head = new;
+// 	else
+// 	{
+// 		while(curr->next != NULL)
+// 			curr = curr->next;
+// 		curr->next = new;
+// 	}
+// 	return (i);
+// }
 
-void add_back(t_arg **head, char *ch)
+void	add_back(t_arg **head, char *ch)
 {
 	t_arg	*curr;
 	t_arg	*new;
@@ -94,13 +113,13 @@ void add_back(t_arg **head, char *ch)
 		*head = new;
 	else
 	{
-		while(curr->next != NULL)
+		while (curr->next != NULL)
 			curr = curr->next;
 		curr->next = new;
 	}
 }
 
-int check_built(char *str)
+int	check_built(char *str)
 {
 	if (ft_strncmp(str, "echo", ft_strlen(str)) == 0)
 		return (0);
@@ -117,10 +136,10 @@ int check_built(char *str)
 	return (1);
 }
 
-int check_q(char *str)
+int	check_q(char *str)
 {
-	int			i;
-	int dq_flag;
+	int	i;
+	int	dq_flag;
 
 	i = 0;
 	dq_flag = 0;
@@ -140,9 +159,9 @@ int check_q(char *str)
 	return (1);
 }
 
-int check_dq(char *str)
+int	check_dq(char *str)
 {
-	int			i;
+	int	i;
 	int	q_flag;
 
 	i = 0;
@@ -163,7 +182,7 @@ int check_dq(char *str)
 	return (1);
 }
 
-int check_redirect(char *str)
+int	check_redirect(char *str)
 {
 	if (str[0] == '<' && str[1] == '<')
 		return (0);
@@ -176,21 +195,21 @@ int check_redirect(char *str)
 	return (1);
 }
 
-int check_exitnumber(char *str)
+int	check_exitnumber(char *str)
 {
 	if (str[0] == '$' && str[1] == '?')
 		return (0);
 	return (1);
 }
 
-int check_pipe(char *str)
+int	check_pipe(char *str)
 {
 	if (str[0] == '|')
 		return (0);
 	return (1);
 }
 
-void assign_q(t_arg **head)
+void	assign_q(t_arg **head)
 {
 	t_arg	*curr;
 
@@ -198,7 +217,7 @@ void assign_q(t_arg **head)
 	curr->type = SINQ;
 }
 
-void assign_dq(t_arg **head)
+void	assign_dq(t_arg **head)
 {
 	t_arg	*curr;
 
@@ -206,7 +225,7 @@ void assign_dq(t_arg **head)
 	curr->type = DOUQ;
 }
 
-void assign_redirect(t_arg **head)
+void	assign_redirect(t_arg **head)
 {
 	t_arg	*curr;
 
@@ -214,7 +233,7 @@ void assign_redirect(t_arg **head)
 	curr->type = RDRT;
 }
 
-void assign_pipe(t_arg **head)
+void	assign_pipe(t_arg **head)
 {
 	t_arg	*curr;
 
@@ -222,7 +241,7 @@ void assign_pipe(t_arg **head)
 	curr->type = PIPE;
 }
 
-void assign_norm(t_arg **head)
+void	assign_norm(t_arg **head)
 {
 	t_arg	*curr;
 
@@ -230,7 +249,7 @@ void assign_norm(t_arg **head)
 	curr->type = NORM;
 }
 
-void assign_parse (t_data *data)
+void	assign_parse (t_data *data)
 {
 	t_arg	*curr;
 
@@ -250,7 +269,6 @@ void assign_parse (t_data *data)
 			assign_norm(&curr);
 		curr = curr->next;
 	}
-
 	replace_ds_parse(data);
 	replace_parse (data);
 }
@@ -288,7 +306,6 @@ char *get_path(char *str)
 				j++;
 			}
 			temp[j] = '\0';
-			printf("%s\n", temp);
 			break;
 		}
 		i++;
@@ -356,22 +373,143 @@ char *replace_dollar_sign(char *st, t_data *data)
 		if (st[i] == '$')
 		{
 			if (st[i] == '$' && st[i + 1] == '?')
-			{
 				temp = ft_itoa(exit_number);
-				return (temp);
-			}
 			else
 			{
-				temp = get_path(st);
-				temp2 = get_full_path(temp, data);
-				free(temp);
-				return (temp2);
+				temp2 = get_path(st);
+				temp = get_full_path(temp2, data);
+				free(temp2);
 			}
+			return (temp);
 		}
 		i++;
 	}
 	return (NULL);
 }
+
+int	before_r_ds_parse(char *str, t_data *data)
+{
+	int			i;
+	int			j;
+	int		flag;
+	char	*temp;
+
+	i = 0;
+	j = 1;
+	flag = 0;
+	temp = NULL;
+	while (str[i] != '\0')
+	{
+		flag = check_flag(flag, &str[i]);
+		if (str[i] == '$' && flag != 2)
+		{
+			temp = replace_dollar_sign(&str[i], data);
+			j += ft_charlen(temp);
+			temp = NULL;
+			i++;
+			while (str[i] != '\"' && str[i] != '\'' && str[i] != '\0' && str[i] != ' ' && str[i] != '$')
+				i++;
+		}
+		else
+		{
+			j++;
+			i++;
+		}
+	}
+	return (j);
+}
+
+// void replace_ds_parse(t_data *data)
+// {
+// 	int		flag;
+// 	t_arg	*curr;
+// 	char	*temp;
+// 	char	*temp2;
+// 	int		i;
+// 	int		j;
+// 	int		k;
+// 	int		l;
+
+
+// 	curr = data->cmd;
+// 	temp = NULL;
+// 	temp2 = NULL;
+// 	i = 0;
+// 	k = 0;
+// 	l = 0;
+// 	flag = 0;
+// 	j = 0;
+// 	while (curr != NULL)
+// 	{
+// 		flag = 0;
+// 		i = 0;
+// 		k = 0;
+// 		j = 0;
+// 		temp = malloc(sizeof(char) * ((before_r_ds_parse(curr->ac, data)) + 1));
+// 		while (curr->ac[i] != '\0')
+// 		{
+// 			flag = check_flag(flag, &curr->ac[i]);
+// 			if (curr->ac[i] == '$' && flag != 2)
+// 			{
+// 				l = 0;
+// 				temp2 = replace_dollar_sign(&curr->ac[i], data);
+// 				while (temp2[l] != '\0')
+// 					temp[k++] = temp2[l++];
+// 				free(temp2);
+// 				i++;
+// 				while (curr->ac[i] != '\"' && curr->ac[i] != '\'' && curr->ac[i] != '\0' && curr->ac[i] != ' ' && curr->ac[i] != '$')
+// 					i++;
+// 			}
+// 			else
+// 				temp[k++] = curr->ac[i++];
+// 		}
+// 		temp[k] = '\0';
+// 		free(curr->ac);
+// 		curr->ac = temp;
+// 		temp = NULL;
+// 		curr = curr->next;
+// 	}
+// }
+
+// char *replace_ds_parse(char *str, t_data *data)
+// {
+// 	int		flag;
+// 	char	*temp;
+// 	char	*temp2;
+// 	char	*ch;
+// 	int		i;
+
+
+// 	temp = NULL; 
+// 	temp2 = NULL;
+// 	str = NULL;
+// 	i = 0;
+// 	flag = 0;
+// 	while (str[i] != '\0')
+// 	{
+// 		flag = check_flag(flag, &str[i]);
+// 		if (str[i] == '$' && flag != 2)
+// 		{   
+// 			temp2 = replace_dollar_sign(str[i], data);
+// 			temp = ft_strjoin_normal(ch, temp2);
+// 			free(ch);
+// 			free(temp2);
+// 			ch = temp;
+// 			i++;
+// 			while (str[i] != '\"' && str[i] != '\'' && str[i] != '\0' && str[i] != ' ' && str[i] != '$')
+// 				i++;
+// 		}
+// 		else
+// 		{	
+// 			temp = ft_strjoin(ch, &str[i]);
+// 			free(ch);
+// 			ch = temp;
+// 			i++;
+// 		}
+// 	}
+// 	free(str);
+// 	return (str);
+// }
 
 void replace_ds_parse(t_data *data)
 {
@@ -421,13 +559,6 @@ void replace_ds_parse(t_data *data)
 		str = NULL;
 		curr = curr->next;
 	}
-	// t_arg *hed = data->cmd;
-	// while(hed != NULL) 
-	// {
-	// 	printf("%s\n", hed->ac);
-	// 	hed = hed->next;
-	// }
-	// printf("%s\n", curr->ac);
 }
 
 char *ft_strcpy_hth(char *str, int here, int there)
@@ -449,35 +580,35 @@ char *ft_strcpy_hth(char *str, int here, int there)
 	return (temp);
 }
 
-int get_total(char *str)
-{
-	int 	i;
-	int		j;
-	int		flag;
+// int get_total(char *str)
+// {
+// 	int 	i;
+// 	int		j;
+// 	int		flag;
 
-	i = 0;
-	j = 0;
-	flag = 0;
-	while (str[i] != '\0')
-	{
-		while(str[i] == '\"' && flag != 2)
-		{
-			j++;
-			i++;
-			if (flag == 1)
-				flag = 0;
-		}
-		while(str[i] == '\'' && flag == 0)
-		{
-			j++;
-			i++;
-			if (flag != 1)
-				flag = 2;
-		}
-		i++;
-	}
-	return (i - j);
-}
+// 	i = 0;
+// 	j = 0;
+// 	flag = 0;
+// 	while (str[i] != '\0')
+// 	{
+// 		while(str[i] == '\"' && flag != 2)
+// 		{
+// 			j++;
+// 			i++;
+// 			if (flag == 1)
+// 				flag = 0;
+// 		}
+// 		while(str[i] == '\'' && flag == 0)
+// 		{
+// 			j++;
+// 			i++;
+// 			if (flag != 1)
+// 				flag = 2;
+// 		}
+// 		i++;
+// 	}
+// 	return (i - j);
+// }
 
 int get_temp_size(char *str)
 {
@@ -508,6 +639,36 @@ int get_temp_size(char *str)
 	return (j);
 }
 
+// char	*replace_parse(char *str)
+// {
+// 	int			i;
+// 	int			j;
+// 	char	*temp;
+// 	char	charset;
+
+// 	i = 0;
+// 	j = 0;
+// 	temp = malloc(sizeof(char) * ((get_temp_size(str)) + 1));
+// 	while (str[i] != '\0')
+// 	{
+// 		if (str[i] == '\'' || str[i] == '\"')
+// 		{
+// 			charset = str[i];
+// 			i++;
+// 			while (str[i] != charset && str[i] != '\0')
+// 				temp[j++] = str[i++];
+// 			if (str[i] != '\0')
+// 				i++;
+// 		}
+// 		else
+// 			temp[j++] = str[i++];
+// 	}
+// 	temp[j] = '\0';
+// 	free(str);
+// 	return (temp);
+// }
+
+
 void  replace_parse(t_data *data)
 {
 	int			i;
@@ -533,20 +694,12 @@ void  replace_parse(t_data *data)
 				charset = curr->ac[i];
 				i++;
 				while (curr->ac[i] != charset && curr->ac[i] != '\0')
-				{
-					temp[j] = curr->ac[i];
-					j++;
-					i++;
-				}
+					temp[j++] = curr->ac[i++];
 				if (curr->ac[i] != '\0')
 					i++;
 			}
 			else
-			{
-				temp[j] = curr->ac[i];
-				j++;
-				i++;
-			}
+				temp[j++] = curr->ac[i++];
 		}
 		temp[j] = '\0';
 		free(curr->ac);
@@ -634,15 +787,12 @@ void before_parse(char *ch, t_data *data)
 	{
 		flag = check_flag(flag, &ch[i]);
 		if ((ch[i] == '|' || ch[i] == '<' || ch[i] == '>' || ch[i] == ';') && flag == 0)
-		{
-			printf("%d\n", flag);			
+		{		
 			temp[j++] = ' ';
 			if (ch[i + 1] != '\0' && ((ch[i] == '<' && ch[i + 1] == '<') || (ch[i] == '>' && ch[i + 1] == '>')))
 			{
-				temp[j++] = ch[i + 1];
-				i++;
-				temp[j++] = ch[i];
-				i++;
+				temp[j++] = ch[++i];
+				temp[j++] = ch[i++];
 			}
 		}
 		temp[j++] = ch[i++];
@@ -668,10 +818,9 @@ void parse(char *ch, t_data *data)
 			add_back(&head, &ch[i]);
 			i += (if_char(&ch[i], " "));
 		}
-		else if (ch[i] == '\"' || ch[i] == '\'')
-			i += (add_back_1(&head, &ch[i]));
 	}
 	data->cmd = head;
+	free(ch);
 	assign_parse (data);
 }
 

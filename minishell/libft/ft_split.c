@@ -65,7 +65,7 @@ char	**malloc_free(char **all)
 char	**ft_split(char const *s, char *c)
 {
 	int		i;
-	int		total; 
+	int		total;
 	char	**dest;
 
 	i = 0;

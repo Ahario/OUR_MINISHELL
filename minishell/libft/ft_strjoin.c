@@ -28,23 +28,20 @@ char	*ft_strjoin_normal(char *s1, char *s2)
 		return (NULL);
 	while (*s1)
 	{
-		temp[i] = *s1;
+		temp[i++] = *s1;
 		s1++;
-		i++;
 	}
 	while (*s2)
 	{
-		temp[i] = *s2;
+		temp[i++] = *s2;
 		s2++;
-		i++;
 	}
 	temp[i] = '\0';
 	return (temp);
 }
 
-char *ft_strjoin(char *s1, char *s2)
+char	*ft_strjoin(char *s1, char *s2)
 {
-
 	char	*temp;
 	size_t	i;
 	int		flag;
