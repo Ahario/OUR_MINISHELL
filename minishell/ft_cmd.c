@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 14:46:05 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/22 00:45:51 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/22 13:39:00 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,7 +195,7 @@ void	ft_cmd_start(t_data *data)
 	ft_signal_cmd();
 	if (!data->next)
 	{
-		printf ("test\n");
+		printf ("test~~~~~~~~\n");
 //		printf ("cmd_head_point %p\n", data);
 //		printf ("cmd_head_cmd %s\n", data->cmd->ac);
 //		printf ("cmd_head_export %s\n", data->envp[0]);

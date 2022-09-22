@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 12:04:06 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/22 13:20:03 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/22 14:43:01 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,11 +266,9 @@ void	ft_redirect_restore(t_data *data, int flag)
 	{
 		restore_in = dup(0);
 		restore_out = dup(1);
-//		printf ("restor\n");
 		if (data->fd_in > 0)
 		{
 			dup2(data->fd_in, 0);
-//			printf ("restorin\n");
 			close(data->fd_in);
 			data->fd_in = -1;
 		}
@@ -278,12 +276,7 @@ void	ft_redirect_restore(t_data *data, int flag)
 		{
 			data->pipe[1] = dup(data->fd_out);
 			dup2(data->fd_out, 1);
-	//		printf ("restor_ou\n");
-	//			if (!data->pipe[1])
-		//	{
-		//		printf ("restor_ou\n");
 			close(data->fd_out);
-		//	}
 			data->fd_out = -1;
 		}
 	}

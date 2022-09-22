@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 14:43:10 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/13 15:08:35 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/22 14:17:14 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,10 @@ void	ft_echo(t_data *data)
 	int		i;
 
 	flag = 0;
-	arg = data->cmd->next;
+	arg = NULL;
+	printf ("AAAAAAA\n");
+	if (data->cmd->next)
+		arg = data->cmd->next;
 	while (arg && !ft_strncmp(arg->ac, "-n", 2))
 	{
 		i = 2;

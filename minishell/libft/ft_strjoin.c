@@ -6,7 +6,7 @@
 /*   By: hyeo <hyeo@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/16 14:08:47 by hyeo              #+#    #+#             */
-/*   Updated: 2022/09/14 01:29:24 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/22 14:25:34 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,17 @@ char *ft_strjoin(char *s1, char *s2)
 	return (temp);
 }
 
-char	*ft_strjoin_normal(char const *s1, char const *s2)
+char	*ft_strjoin_normal(char *s1, char *s2)
 {
 	char	*temp;
 	size_t	i;
 
 	i = 0;
+	if (!s1)
+	{
+		s1 = malloc(sizeof(char) * 1);
+		s1[0] = '\0';
+	}
 	temp = malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
 	if (temp == NULL)
 		return (NULL);

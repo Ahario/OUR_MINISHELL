@@ -6,7 +6,7 @@
 /*   By: hyeo <hyeo@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/16 14:45:32 by hyeo              #+#    #+#             */
-/*   Updated: 2022/09/21 01:47:59 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/22 14:25:54 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len);
 char	*ft_strjoin(char *s1, char *s2);
 char	*ft_strjoin_free(char const *s1, char const *s2);
 char	*ft_strjoin_keyval(char const *s1, char const *s2);
-char	*ft_strjoin_normal(char const *s1, char const *s2);
+char	*ft_strjoin_normal(char *s1, char *s2);
 char	*ft_strtrim(char const *s1, char const *set);
 char	**ft_split(char const *s, char *c);
 char	*ft_itoa(int n);

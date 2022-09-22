@@ -40,7 +40,14 @@ enum	e_pars{
     RDRT, DRGT
 };
 
+void replace_ds_parse(t_data *data);
+char *replace_dollar_sign(char *str, t_data *data);
 void replace_parse(t_data *data);
+int get_temp_size(char *str);
+void parse(char *ch, t_data *data);
+int check_flag(int flag, char *str);
+int totla_path_len(char *str);
+int ft_charlen(char *str);
 int check_built(t_data *data, char *str);
 void play_built(t_data *data, char *str);
 void	ft_set_data(t_data *data);

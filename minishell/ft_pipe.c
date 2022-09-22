@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/21 12:51:40 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/22 13:18:01 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/22 15:00:29 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ void	last_cmd(t_data *data)
 
 	ret = 0;
 	cmd = NULL;
-//	close(data->pipe[1]);
 	printf ("fd_in %d\n" ,data->fd_in);
 	printf ("fd_out %d\n" ,data->fd_out);
 	printf ("fd_pipe_in %d\n" ,data->pipe[1]);
@@ -55,6 +54,9 @@ void	last_cmd(t_data *data)
 		cmd = ft_executable(data);
 		arg = ft_arg_split(data->cmd);
 		execve(cmd, arg, data->envp);
+		free(cmd);
+		close(data->pipe[1]);
+		close(data->pipe[0]);
 		ret = 1;
 	}
 //	sleep(10);
@@ -81,6 +83,9 @@ void	first_cmd(t_data *data)
 		cmd = ft_executable(data);
 		arg = ft_arg_split(data->cmd);
 		execve(cmd, arg, data->envp);
+		free(cmd);
+		close(data->pipe[1]);
+		close(data->pipe[0]);
 		ret = 1;
 	}
 	ft_redirect_restore(data, 1);
@@ -118,7 +123,9 @@ void	ft_pipe_cmd(t_data *data)
 				first_cmd(tem);
 			}
 			else if (!tem->next)
+			{
 				last_cmd(tem);
+			}
 		//	else if (tem->next)
 		//		child_cmd(tem);
 		}
@@ -126,8 +133,11 @@ void	ft_pipe_cmd(t_data *data)
 		{
 			close(tem->pipe[1]);
 			waitpid(pid, &check, 0);
+			if (!tem->next)
+				break;
 			tem = tem->next;
 		}
+		close(tem->pipe[1]);
 	}
 }
 
