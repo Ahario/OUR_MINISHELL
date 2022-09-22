@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 12:04:06 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/22 14:43:01 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/22 18:35:16 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ int	infilename_check(t_data *data, char *str, int *i, int flag)
 		return (1);
 	while (size >= 0)
 		filename[size--] = str[j--];
-//	printf("%s\n", filename);
+	printf("%s\n", filename);
 	if (ft_open_flag(data, filename, flag) == -1)
 	{
 		error_message("MINISHELL: ");
@@ -116,8 +116,12 @@ struct s_data	*ft_symbol(t_data *data, t_arg *cmd)
 			else
 				i += 2;
 			if(!infilename_check(data, str, &i, flag))
+			{
 				if (cmd)
 					cmd = ft_list_del(cmd);
+			}
+			else
+				return (0);
 		}
 		else if ((str[i] == '<' && str[i + 1] == '<')
 				&& cmd->type != SINQ && cmd->type != DOUQ)
@@ -150,8 +154,12 @@ struct s_data	*ft_symbol(t_data *data, t_arg *cmd)
 				else
 					i++;
 				if(!infilename_check(data, str, &i, flag))
+				{
 					if (cmd)
 						cmd = ft_list_del(cmd);
+				}
+				else
+					return (0);
 			}
 			else if (str[i] == '>')
 			{
@@ -164,10 +172,13 @@ struct s_data	*ft_symbol(t_data *data, t_arg *cmd)
 				else
 					i++;
 				if(!infilename_check(data, str, &i, flag))
+				{
 					if (cmd)
 						cmd = ft_list_del(cmd);
+				}
+				else
+					return (0);
 			}
-
 		}
 		else
 		{
@@ -234,7 +245,7 @@ void	ft_dep(t_data *data)
 	}
 }*/
 
-void	ft_redir(t_data *data)
+int	ft_redir(t_data *data)
 {
 //	printf("!!~~~~~~~!!!\n");
 //	ft_dep(data);
@@ -246,13 +257,16 @@ void	ft_redir(t_data *data)
 	while (data)
 	{
 		data = ft_symbol(data, data->cmd);
+		if (!data)
+			return (1);
 		if(!data->next)
 			break;
 		data = data->next;
 	}
+	printf ("~~~~~~~~~\n");
 	while (data->prev)
 		data = data->prev;
-	return ;
+	return (0);
 }
 
 void	ft_redirect_restore(t_data *data, int flag)
@@ -274,7 +288,6 @@ void	ft_redirect_restore(t_data *data, int flag)
 		}
 		if (data->fd_out > 0)
 		{
-			data->pipe[1] = dup(data->fd_out);
 			dup2(data->fd_out, 1);
 			close(data->fd_out);
 			data->fd_out = -1;

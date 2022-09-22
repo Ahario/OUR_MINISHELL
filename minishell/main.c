@@ -6,7 +6,7 @@
 /*   By: hyeo <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 13:15:32 by hyeo              #+#    #+#             */
-/*   Updated: 2022/09/22 14:41:50 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/22 19:00:41 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -851,6 +851,14 @@ void before_init(void)
 	exit_number = 127;
 }
 
+void	ft_set_data(t_data *data)
+{
+	data->fd_in = -1;
+	data->fd_out = -1;
+	data->prev = NULL;
+	data->next = NULL;
+}
+
 void	clean_all(t_data *data)
 {
 	t_arg	*next;
@@ -866,15 +874,10 @@ void	clean_all(t_data *data)
 			free(data->cmd);
 		data->cmd = next;
 	}
+	ft_set_data(data);
 }
 
-void	ft_set_data(t_data *data)
-{
-	data->fd_in = -1;
-	data->fd_out = -1;
-	data->prev = NULL;
-	data->next = NULL;
-}
+
 
 char	**ft_malloc_envp(char **envp)
 {
@@ -915,14 +918,13 @@ int	main(int argc, char *argv[], char **envp)
 		{
 			before_parse(ch, data);
 		//	printf ("AAAAAAA\n");
-			ft_redir(data);
-			ft_cmd_start(data);
+			if(!ft_redir(data))
+				ft_cmd_start(data);
 		}
 		else if (!ch)
 			exit_C_d();
 		add_history(ch);
 		clean_all(data);
-		printf("~~~\n");
 		free(ch);
 	}
 	tcsetattr(STDIN_FILENO, TCSANOW, &terminal);

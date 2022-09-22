@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/21 12:51:40 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/22 15:00:29 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/22 19:18:36 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,11 @@ void	first_cmd(t_data *data)
 	cmd = NULL;
 //	close(data->pipe[0]);
 //	printf("!!11\n");
+	printf ("1fd_in %d\n" ,data->fd_in);
+	printf ("1fd_out %d\n" ,data->fd_out);
+	printf ("1fd_pipe_in %d\n" ,data->pipe[1]);
+	printf ("1fd_pipe_out %d\n" ,data->pipe[0]);
+
 	ft_redirect_restore(data, 0);
 //	printf("!!111\n");
 	if(data->cmd && !check_built(data, data->cmd->ac))
@@ -84,10 +89,45 @@ void	first_cmd(t_data *data)
 		arg = ft_arg_split(data->cmd);
 		execve(cmd, arg, data->envp);
 		free(cmd);
-		close(data->pipe[1]);
-		close(data->pipe[0]);
+		close(data->prev->pipe[1]);
 		ret = 1;
 	}
+	close(data->pipe[1]);
+	close(data->pipe[0]);
+	ft_redirect_restore(data, 1);
+	exit(ret);
+}
+
+void	child_cmd(t_data *data)
+{
+	char	*cmd;
+	char	**arg;
+	int		ret;
+
+	ret = 0;
+	cmd = NULL;
+//	close(data->pipe[0]);
+//	printf("!!11\n");
+	printf ("2fd_in %d\n" ,data->fd_in);
+	printf ("2fd_out %d\n" ,data->fd_out);
+	printf ("2fd_pipe_in %d\n" ,data->pipe[1]);
+	printf ("2fd_pipe_out %d\n" ,data->pipe[0]);
+
+	ft_redirect_restore(data, 0);
+//	printf("!!111\n");
+	if(data->cmd && !check_built(data, data->cmd->ac))
+		play_built(data, data->cmd->ac);
+	else
+	{
+		cmd = ft_executable(data);
+		arg = ft_arg_split(data->cmd);
+		execve(cmd, arg, data->envp);
+		free(cmd);
+		close(data->prev->pipe[0]);
+		ret = 1;
+	}
+	close(data->pipe[1]);
+	close(data->pipe[0]);
 	ft_redirect_restore(data, 1);
 	exit(ret);
 }
@@ -116,18 +156,18 @@ void	ft_pipe_cmd(t_data *data)
 				printf("%s: command not found\n", tem->cmd->ac);
 				return ;
 			}
-			if (tem->next)
+			if (!tem->prev)
 			{
-	//			printf("!!1\n");
 				close(tem->pipe[0]);
 				first_cmd(tem);
 			}
 			else if (!tem->next)
-			{
 				last_cmd(tem);
+			else if (tem->next)
+			{
+				close(tem->pipe[0]);
+				child_cmd(tem);
 			}
-		//	else if (tem->next)
-		//		child_cmd(tem);
 		}
 		else
 		{
@@ -137,8 +177,9 @@ void	ft_pipe_cmd(t_data *data)
 				break;
 			tem = tem->next;
 		}
-		close(tem->pipe[1]);
 	}
+	close(tem->pipe[1]);
+	close(tem->pipe[0]);
 }
 
 void	ft_pipe_set(t_data *data, t_data *new)
@@ -151,6 +192,7 @@ void	ft_pipe_set(t_data *data, t_data *new)
 	new->pipe = fd;
 	data->fd_out = fd[1];
 	new->fd_in = fd[0];
+	new->fd_out = -1;
 }
 
 struct s_data	*ft_pipe_list(t_data *data)

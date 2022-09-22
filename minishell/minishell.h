@@ -78,7 +78,6 @@ void	ft_cd(t_data *data);
 //
 void	ft_echo(t_data *data);
 //
-void	ft_redir(t_data *data);
 //cmd
 void	ft_cmd_start(t_data *data);
 char	**ft_arg_split(t_arg *cmd);
@@ -88,7 +87,7 @@ void	free_split(char **str);
 struct s_arg	*ft_list_del(t_arg *cmd);
 struct s_arg	*ft_list_del_n(t_arg *cmd);
 //redir
-void	ft_redir(t_data	*data);
+int	ft_redir(t_data	*data);
 void	ft_redirect_restore(t_data *data, int flag);
 //here_doc
 void	ft_here_doc(t_data *data, char *str, int *i, char *stop);
