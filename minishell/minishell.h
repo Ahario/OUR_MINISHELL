@@ -22,11 +22,15 @@ typedef struct s_arg{
 
 typedef struct s_data{
 	t_arg	*cmd;
+	t_arg	*start;
 	int		argc;
 	char	**argv;
 	char	**envp;
 	int		fd_out;
 	int		fd_in;
+	int		*pipe;
+	struct s_data	*prev;
+	struct s_data	*next;
 }	t_data;
 
 
@@ -39,9 +43,11 @@ enum	e_pars{
 void replace_parse(t_data *data);
 int check_built(t_data *data, char *str);
 void play_built(t_data *data, char *str);
+void	ft_set_data(t_data *data);
 //t_arg	*set_cmd(char *ch);
 void	before_init(void);
 void	ft_signal(void);
+void	ft_signal_cmd(void);
 void	exit_C_d(void);
 
 //exit
@@ -68,12 +74,18 @@ void	ft_echo(t_data *data);
 void	ft_redir(t_data *data);
 //cmd
 void	ft_cmd_start(t_data *data);
+char	**ft_arg_split(t_arg *cmd);
+char	*ft_executable(t_data *data);
 //free_utils
 void	free_split(char **str);
 struct s_arg	*ft_list_del(t_arg *cmd);
+struct s_arg	*ft_list_del_n(t_arg *cmd);
 //redir
 void	ft_redir(t_data	*data);
 void	ft_redirect_restore(t_data *data, int flag);
 //here_doc
 void	ft_here_doc(t_data *data, char *str, int *i, char *stop);
+//pipe
+struct s_data	*ft_pipe_list(t_data *data);
+void	ft_pipe_cmd(t_data *data);
 #endif

@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 14:46:05 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/20 17:37:07 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/22 00:45:51 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,11 @@ void	ft_child_cmd(t_data *data, char *cmd)
 //	int	i;
 
 //	i = 0;
+//	printf("data fd_in%d\n", data->fd_in);
+//	printf("data fd_out%d\n", data->fd_out);
 	ft_redirect_restore(data, 0);
 	arg = ft_arg_split(data->cmd);
-//	printf ("cmd %s\n", cmd);
+//	printf ("cmdcmd %s\n", cmd);
 //	while (arg[i])
 //		printf ("arg %s\n", arg[i++]);
 	if (execve(cmd, arg, data->envp))
@@ -63,7 +65,8 @@ void	ft_child_cmd(t_data *data, char *cmd)
 		free(cmd);
 		exit (0);
 	}
-	exit (0);
+	ft_redirect_restore(data, 1);
+	exit (1);
 }
 
 char	*ft_home_path(t_data *data)
@@ -184,20 +187,36 @@ void	ft_cmd_start(t_data *data)
 
 	cmd = data->cmd;
 	if (!cmd)
-		return ;
-	if (ft_strchr(cmd->ac, ' '))
 	{
-		error_message("MINISHELL: ");
-		printf("%s: command not found\n", cmd->ac);
+	//	ft_redirect_restore(data, 0);
+	//	ft_redirect_restore(data, 1);
 		return ;
 	}
-	if(!check_built(data, cmd->ac))
+	ft_signal_cmd();
+	if (!data->next)
 	{
-		ft_redirect_restore(data, 0);
-		play_built(data, cmd->ac);
-		ft_redirect_restore(data, 1);
+		printf ("test\n");
+//		printf ("cmd_head_point %p\n", data);
+//		printf ("cmd_head_cmd %s\n", data->cmd->ac);
+//		printf ("cmd_head_export %s\n", data->envp[0]);
+		cmd = data->cmd;
+		if(cmd && ft_strchr(cmd->ac, ' '))
+		{
+			error_message("MINISHELL: ");
+			printf("%s: command not found\n", cmd->ac);
+			return ;
+		}
+		if(cmd && !check_built(data, cmd->ac))
+		{
+			ft_redirect_restore(data, 0);
+			play_built(data, cmd->ac);
+			ft_redirect_restore(data, 1);
+		}
+		else
+			ft_one_cmd(data);
+		ft_signal();
+		return ;
 	}
-	else
-		ft_one_cmd(data);
-	return ;
+	ft_pipe_cmd(data);
+	ft_signal();
 }

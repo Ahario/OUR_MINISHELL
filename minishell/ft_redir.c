@@ -6,12 +6,13 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 12:04:06 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/20 19:41:59 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/22 13:20:03 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/libft.h"
 #include "minishell.h"
+#include <stddef.h>
 #include <stdio.h>
 #include <sys/fcntl.h>
 
@@ -90,7 +91,8 @@ int	infilename_check(t_data *data, char *str, int *i, int flag)
 	return (0);
 }
 
-struct s_arg	*ft_symbol(t_data *data, t_arg *cmd)
+/*struct s_arg*/
+struct s_data	*ft_symbol(t_data *data, t_arg *cmd)
 {
 	char	*str;
 	t_arg	*prev;
@@ -102,7 +104,8 @@ struct s_arg	*ft_symbol(t_data *data, t_arg *cmd)
 	{
 		i = 0;
 		str = cmd->ac;
-		if ((str[i] == '>' && str[i + 1] == '>'))
+		if ((str[i] == '>' && str[i + 1] == '>')
+				&& cmd->type != SINQ && cmd->type != DOUQ)
 		{
 			flag = 2;
 			if (str[i + 2] == '\0')
@@ -116,7 +119,9 @@ struct s_arg	*ft_symbol(t_data *data, t_arg *cmd)
 				if (cmd)
 					cmd = ft_list_del(cmd);
 		}
-		else if ((str[i] == '<' && str[i + 1] == '<'))
+		else if ((str[i] == '<' && str[i + 1] == '<')
+				&& cmd->type != SINQ && cmd->type != DOUQ)
+
 		{
 			if (str[i + 2] == '\0')
 			{
@@ -131,7 +136,8 @@ struct s_arg	*ft_symbol(t_data *data, t_arg *cmd)
 			if (cmd)
 				cmd = ft_list_del(cmd);
 		}
-		else if ((str[i] == '<' || str[i] == '>')) //&& tem->type == 0)
+		else if ((str[i] == '<' || str[i] == '>')
+				&& cmd->type != SINQ && cmd->type != DOUQ)
 		{
 			if (str[i] == '<')
 			{
@@ -170,10 +176,10 @@ struct s_arg	*ft_symbol(t_data *data, t_arg *cmd)
 			cmd = cmd->next;
 		}
 	}
-	cmd = prev;
-	while (cmd && cmd->prev)
-		cmd = cmd->prev;
-	return (cmd);
+	data->cmd = prev;
+/*	while (cmd && cmd->prev)
+		cmd = cmd->prev;*/
+	return (data);
 }
 
 void	ft_cmd_set(t_data *data)
@@ -232,8 +238,20 @@ void	ft_redir(t_data *data)
 {
 //	printf("!!~~~~~~~!!!\n");
 //	ft_dep(data);
+
+	data->prev = NULL;
+	data->next = NULL;
 	ft_cmd_set(data);
-	data->cmd = ft_symbol(data, data->cmd);
+	data = ft_pipe_list(data);
+	while (data)
+	{
+		data = ft_symbol(data, data->cmd);
+		if(!data->next)
+			break;
+		data = data->next;
+	}
+	while (data->prev)
+		data = data->prev;
 	return ;
 }
 
@@ -242,27 +260,37 @@ void	ft_redirect_restore(t_data *data, int flag)
 	static int	restore_in = -1;
 	static int	restore_out = -1;
 
-	if (data->fd_in < 0 && data->fd_out < 0 &&restore_in < 0 && restore_out < 0)
+	if (data->fd_in < 0 && data->fd_out < 0 && restore_in < 0 && restore_out < 0)
 		return;
 	if (!flag)
 	{
 		restore_in = dup(0);
 		restore_out = dup(1);
+//		printf ("restor\n");
 		if (data->fd_in > 0)
 		{
 			dup2(data->fd_in, 0);
+//			printf ("restorin\n");
 			close(data->fd_in);
 			data->fd_in = -1;
 		}
 		if (data->fd_out > 0)
 		{
+			data->pipe[1] = dup(data->fd_out);
 			dup2(data->fd_out, 1);
+	//		printf ("restor_ou\n");
+	//			if (!data->pipe[1])
+		//	{
+		//		printf ("restor_ou\n");
 			close(data->fd_out);
+		//	}
 			data->fd_out = -1;
 		}
 	}
 	else if(flag)
 	{
+		close(0);
+		close(1);
 		dup2(restore_in, 0);
 		dup2(restore_out, 1);
 		close(restore_in);

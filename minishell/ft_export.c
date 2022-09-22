@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/01 21:24:56 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/14 15:11:58 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/21 18:32:11 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ char	**print_array(char **envp)
 	int		size;
 
 	i = 0;
-	array = envp;
+	array = ft_strdup_2(envp);
 	while (array[i])
 		i++;
 	size = i - 1;
@@ -115,6 +115,7 @@ void	ft_export_narg(char **envp)
 			printf ("\n");
 		i++;
 	}
+	free_split(array);
 }
 
 int	ft_check_key(char *str, int flag)

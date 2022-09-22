@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 01:50:20 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/14 14:45:42 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/21 21:05:17 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ void	ft_cd(t_data *data)
 	}
 	else
 	{
+		printf ("!!!!!!test\n");
 		if (chdir(arg->ac) == -1)
 		{
 			error_message("MINISHELL : cd error\n");

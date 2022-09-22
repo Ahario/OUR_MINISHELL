@@ -533,6 +533,8 @@ void	clean_all(t_data *data)
 {
 	t_arg	*next;
 
+	data->fd_in = -1;
+	data->fd_out = -1;
 	while (data->cmd)
 	{
 		if (data->cmd->ac)
@@ -560,10 +562,17 @@ char	**ft_malloc_envp(char **envp)
 	}
 	return (ret);
 }
+void	ft_set_data(t_data *data)
+{
+	data->fd_in = -1;
+	data->fd_out = -1;
+	data->prev = NULL;
+	data->next = NULL;
+}
 
 int	main(int argc, char *argv[], char **envp)
 {
-	t_data			data;
+	t_data			*data;
 	struct termios	terminal;
 	char			*ch;
 
@@ -571,21 +580,23 @@ int	main(int argc, char *argv[], char **envp)
 	before_init();
 	(void)argc;
 	(void)argv;
-	data.envp = ft_malloc_envp(envp);
+	data = (t_data *)malloc(sizeof(t_data));
+	ft_set_data(data);
+	data->envp = ft_malloc_envp(envp);
 	ft_signal();
 	while(1)
 	{
 		ch = readline("MINISHELL./ ");
 		if (ch)
 		{
-			parse(ch, &data);
-			ft_redir(&data);
-			ft_cmd_start(&data);
+			parse(ch, data);
+			ft_redir(data);
+			ft_cmd_start(data);
 		}
 		else if (!ch)
 			exit_C_d();
 		add_history(ch);
-		clean_all(&data);
+		clean_all(data);
 		free(ch);
 	}
 	tcsetattr(STDIN_FILENO, TCSANOW, &terminal);

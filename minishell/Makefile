@@ -10,7 +10,8 @@ SRCS = main.c \
 	   ft_redir.c\
 	   free_utils.c\
 	   ft_cmd.c\
-	   ft_here_doc.c
+	   ft_here_doc.c\
+	   ft_pipe.c
 LIBFT = -L ./libft -lft
 LIBSRCS = libft
 OBJS = ${SRCS:.c=.o}
