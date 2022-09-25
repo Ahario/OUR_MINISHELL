@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 12:04:06 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/25 20:59:22 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/26 02:21:06 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -353,13 +353,13 @@ void	ft_redirect_restore(t_data *data, int flag)
 		if (data->fd_in > 0)
 		{
 			dup2(data->fd_in, 0);
-			close(data->fd_in);
+	//		close(data->fd_in);
 			data->fd_in = -1;
 		}
 		if (data->fd_out > 0)
 		{
 			dup2(data->fd_out, 1);
-			close(data->fd_out);
+	//		close(data->fd_out);
 			data->fd_out = -1;
 		}
 	}
