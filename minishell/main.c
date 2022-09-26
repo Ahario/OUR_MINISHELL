@@ -982,17 +982,16 @@ void	before_parse(char *ch, t_data *data)
 	{
 		flag = check_flag(flag, &ch[i]);
 		if (for_red(&ch[i], flag) == 0)
-		{
+		{ 
 			if (ch[i - 1] != ' ')
 				temp[j++] = ' ';
 			if (for_d_red(&ch[i]) == 0)
 				increase_temp(&temp[j], &ch[i], &i, &j);
 		}
 		temp[j++] = ch[i++];
-		if (i > 0 && ((ch[i - 1] == '|' && ch[i] != ' ' && ch[i] != '|')))
+		if (i > 0 && ((ch[i - 1] == '|' && ch[i] != ' ' && ch[i] != '|')
+			|| (ch[i - 1] == '<' && ch[i] != ' ') || (ch[i - 1] == '>' && ch[i] != ' ')))
 			temp[j++] = ' ';
-		// if (i > 1 && ((ch[i - 1] == '\"' && ch[i - 2] == '$')))
-		// 	temp[j++] = ' ';
 	}
 	temp[j] = '\0';
 	parse(temp, data);
