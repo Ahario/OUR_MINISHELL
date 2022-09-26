@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/21 12:51:40 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/26 03:22:36 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/26 16:36:43 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,27 +20,34 @@ void	last_cmd(t_data *data)
 {
 	char	*cmd;
 	char	**arg;
-	int		ret;
 
-	ret = 0;
 	cmd = NULL;
+//	printf ("last_out%d\n", data->fd_out);
+//	printf ("last_in%d\n", data->fd_in);
+//	printf ("last_pi_extrance%d\n", data->pipe[0]);
+	if (data->fd_in > 0)
+		close(data->pipe[0]);
+	else
+		data->fd_in = data->pipe[0];
+	data->pipe[0] = -1;
 	ft_redirect_restore(data, 0);
 	if (data->cmd && !check_built(data, data->cmd->ac))
+	{
 		play_built(data, data->cmd->ac);
+	}
 	else
 	{
 		cmd = ft_executable(data, 0);
 		arg = ft_arg_split(data->cmd);
 		execve(cmd, arg, data->envp);
-		printf("%s\n", strerror(errno));
-		free(arg);
-		free(cmd);
-		sleep(1);
-		if (ret == -1)
-			ret = 1;
+		ft_redirect_restore(data, 1);
+		if (errno != 2)
+			printf("%s\n", strerror(errno));
+		if (errno && errno != 2)
+			exit(errno);
 	}
 	ft_redirect_restore(data, 1);
-	exit(ret);
+	exit(0);
 }
 
 void	first_cmd(t_data *data)
@@ -51,9 +58,23 @@ void	first_cmd(t_data *data)
 
 	ret = 0;
 	cmd = NULL;
+//	printf ("fd_out%d\n", data->fd_out);
+//	printf ("fd_in%d\n", data->fd_in);
+//	printf ("fd_pip_exit%d\n", data->pipe[1]);
+	if (data->fd_out > 0)
+	{
+		close(data->pipe[1]);
+	}
+	else
+	{
+		data->fd_out = data->pipe[1];
+	}
+	data->pipe[1] = -1;
 	ft_redirect_restore(data, 0);
 	if (data->cmd && !check_built(data, data->cmd->ac))
+	{
 		play_built(data, data->cmd->ac);
+	}
 	else
 	{
 		cmd = ft_executable(data, 0);
@@ -66,17 +87,30 @@ void	first_cmd(t_data *data)
 		printf("%s\n", strerror(errno));
 	}
 	ft_redirect_restore(data, 1);
-	exit(ret);
+	exit(0);
 }
 
 void	child_cmd(t_data *data)
 {
 	char	*cmd;
 	char	**arg;
-	int		ret;
 
-	ret = 0;
 	cmd = NULL;
+
+//	printf ("chfd_in%d\n", data->fd_in);
+//	printf ("chfd_ouu%d\n", data->fd_out);
+//	printf ("chfd_pip_entrance%d\n", data->pipe[0]);
+//	printf ("chfd_pip_entrance%d\n", data->pipe[1]);
+	if (data->fd_in > 0)
+		close(data->prev->pipe[0]);
+	else
+		data->fd_in = data->prev->pipe[0];
+	data->pipe[0] = -1;
+	if (data->fd_out > 0)
+		close(data->pipe[1]);
+	else
+		data->fd_out = data->pipe[1];
+	data->pipe[1] = -1;
 	ft_redirect_restore(data, 0);
 	if (data->cmd && !check_built(data, data->cmd->ac))
 		play_built(data, data->cmd->ac);
@@ -87,11 +121,10 @@ void	child_cmd(t_data *data)
 		execve(cmd, arg, data->envp);
 		free(cmd);
 		free(arg);
-		if (ret == -1)
-			ret = 1;
+		exit(errno);
 	}
 	ft_redirect_restore(data, 1);
-	exit(ret);
+	exit(0);
 }
 
 static void	ft_child_pipe(t_data *tem)
@@ -105,10 +138,10 @@ static void	ft_child_pipe(t_data *tem)
 	}
 	if (!tem->next)
 		last_cmd(tem);
+	else if (!tem->prev)
+		first_cmd(tem);	
 	else if (tem->next)
 		child_cmd(tem);
-	else if (!tem->prev)
-		first_cmd(tem);
 }
 
 static int	ft_parent_pipe(t_data *tem, int pid)
@@ -146,7 +179,10 @@ void	ft_pipe_cmd(t_data *data)
 		if (pid < 0)
 			error_message(" Fork error\n", NULL);
 		if (pid == 0)
+		{
+	//		printf ("fd_in%d\n", data->fd_out);
 			ft_child_pipe(tem);
+		}
 		else
 		{
 			if (ft_parent_pipe(tem, pid))
@@ -155,6 +191,12 @@ void	ft_pipe_cmd(t_data *data)
 		}
 	}
 	waitpid(pid, &check, 0);
+	if (errno == 2 && check)
+		g_exit_number = 2;
+	else if (check)
+		g_exit_number = 1;
+	else
+		g_exit_number = 0;
 	while(tem->prev)
 	{
 		close(tem->pipe[0]);
@@ -172,9 +214,9 @@ void	ft_pipe_set(t_data *data, t_data *new)
 		error_message(" PIPE ERROR \n", NULL);
 	data->pipe = fd;
 	new->pipe = fd;
-	data->fd_out = fd[1];
-	new->fd_in = fd[0];
-	new->fd_out = -1;
+//	data->fd_out = fd[1];
+//	new->fd_in = fd[0];
+//	new->fd_out = -1;
 }
 
 static t_data	*ft_pipe_list_utill(t_data	*data, t_arg *tem)

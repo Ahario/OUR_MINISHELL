@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 14:46:05 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/26 03:25:30 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/26 15:09:39 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -266,6 +266,8 @@ void	ft_cmd_start(t_data *data)
 		return ;
 	}
 	else
+	{
 		ft_pipe_cmd(data);
+	}
 	ft_signal();
 }

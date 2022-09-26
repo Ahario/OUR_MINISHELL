@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 12:04:06 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/26 02:21:06 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/26 14:48:26 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ int	infilename_check(t_data *data, char *str, int *i, int flag)
 		ft_putstr_fd(": No such file or directory\n", 2);
 		free(filename);
 		data->fd_in = -1;
+		data->fd_out = -1;
 		g_exit_number = 1;
 		return (1);
 	}
@@ -350,16 +351,17 @@ void	ft_redirect_restore(t_data *data, int flag)
 	{
 		restore_in = dup(0);
 		restore_out = dup(1);
+		data->res_out = dup(1);
 		if (data->fd_in > 0)
 		{
 			dup2(data->fd_in, 0);
-	//		close(data->fd_in);
+			close(data->fd_in);
 			data->fd_in = -1;
 		}
 		if (data->fd_out > 0)
 		{
 			dup2(data->fd_out, 1);
-	//		close(data->fd_out);
+			close(data->fd_out);
 			data->fd_out = -1;
 		}
 	}

@@ -6,7 +6,7 @@
 /*   By: hyeo <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 13:15:32 by hyeo              #+#    #+#             */
-/*   Updated: 2022/09/25 23:31:27 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/26 15:00:40 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -989,7 +989,7 @@ void	before_parse(char *ch, t_data *data)
 				increase_temp(&temp[j], &ch[i], &i, &j);
 		}
 		temp[j++] = ch[i++];
-		if (i > 0 && ((ch[i - 1] == '|' && ch[i] != ' ' && ch[i] != '|')
+		if (flag == 0 && i > 0 && ((ch[i - 1] == '|' && ch[i] != ' ' && ch[i] != '|')
 			|| (ch[i - 1] == '<' && ch[i] != ' ') || (ch[i - 1] == '>' && ch[i] != ' ')))
 			temp[j++] = ' ';
 	}
@@ -1155,7 +1155,9 @@ int	main(int argc, char *argv[], char **envp)
 			{
 				before_parse(ch, data);
 				if(!ft_redir(data))
+				{
 					ft_cmd_start(data);
+				}
 			}
 		}
 		else if (!ch)
