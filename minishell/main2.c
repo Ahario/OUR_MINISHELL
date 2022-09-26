@@ -6,7 +6,7 @@
 /*   By: hyeo <marvin@42.fr>                        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/22 13:15:32 by hyeo              #+#    #+#             */
-/*   Updated: 2022/09/26 21:17:13 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/26 21:00:19 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,38 @@ int	if_char(char const *str)
 	}
 	return (i);
 }
+
+// int add_back_1(t_arg **head, char *ch)
+// {
+// 	t_arg	*curr;
+// 	t_arg	*new;
+// 	int 		i;
+
+// 	i = 0;
+// 	curr = *head;
+// 	while (ch[i] != '\0')
+// 	{
+// 		i++;
+// 		if ((ch[i] == ch[0] && ch[i - 1] != '\\'))
+// 		{
+// 			i++;
+// 			break;
+// 		}
+// 	}
+// 	new = malloc(sizeof(t_arg) * 1);
+// 	new->ac = malloc(sizeof(char) * (i + 1));
+// 	ft_strlcpy(new->ac, ch, (i + 1));
+// 	new->next = NULL;
+// 	if (*head == NULL)
+// 		*head = new;
+// 	else
+// 	{
+// 		while(curr->next != NULL)
+// 			curr = curr->next;
+// 		curr->next = new;
+// 	}
+// 	return (i);
+// }
 
 void	add_back(t_arg **head, char *ch)
 {
@@ -358,22 +390,6 @@ int	search_mini_path(int j, char *envp[], char *str)
 	return (1);
 }
 
-char	*backup_path(char *str)
-{
-	int		i;
-	int		j;
-	char	*temp;
-
-	i = 1;
-	j = 0;
-	temp = malloc(sizeof(char) * (ft_charlen(str)) + 2);
-	temp[0] = '$';
-	while (str[j] != '\0')
-		temp[i++] = str[j++];
-	temp[i] = '\0';
-	return (temp);
-}
-
 char	*get_full_path(char *str, t_data *data)
 {
 	int		i;
@@ -388,7 +404,7 @@ char	*get_full_path(char *str, t_data *data)
 	while (data->envp[i] != NULL && search_mini_path(i, data->envp, str))
 		i++;
 	if (data->envp[i] == NULL)
-		return (backup_path(str));
+		return (temp);
 	while (data->envp[i][j] != '=')
 		j++;
 	j++;
@@ -623,7 +639,9 @@ char	*get_full_path_dq(char *str, t_data *data)
 	while (data->envp[i] != NULL && search_mini_path(i, data->envp, str))
 		i++;
 	if (data->envp[i] == NULL)
-		return (backup_path(str));
+	{
+		return (temp);
+	}
 	while (data->envp[i][j] != '=')
 		j++;
 	j++;

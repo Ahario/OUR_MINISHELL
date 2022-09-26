@@ -29,9 +29,7 @@ typedef struct s_data{
 	int		fd_out;
 	int		fd_in;
 	int		*pipe;
-	int		*par_pipe;
-	int		res_in;
-	int		res_out;
+	int		error;
 	struct s_data	*prev;
 	struct s_data	*next;
 }	t_data;

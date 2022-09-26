@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 12:04:06 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/26 19:09:43 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/26 22:43:14 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,21 +37,21 @@ int	ft_open_flag(t_data *data, char *filename, int flag)
 	ret = 0;
 	if (flag == 0)
 	{
-		if(data->fd_in > 0)
+		if (data->fd_in > 0)
 			close(data->fd_in);
 		ret = open(filename, O_RDONLY);
 		data->fd_in = ret;
 	}
 	else if (flag == 1)
 	{
-		if(data->fd_out > 0)
+		if (data->fd_out > 0)
 			close(data->fd_out);
 		ret = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		data->fd_out = ret;
 	}
 	else if (flag == 2)
 	{
-		if(data->fd_out > 0)
+		if (data->fd_out > 0)
 			close(data->fd_out);
 		ret = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 		data->fd_out = ret;
@@ -116,15 +116,19 @@ int	infilename_check(t_data *data, char *str, int *i, int flag)
 		filename[size--] = str[--j];
 	if (ft_open_flag(data, filename, flag) == -1)
 	{
-		error_message(NULL, NULL);
-		ft_putstr_fd(filename, 2);
-		ft_putstr_fd(": No such file or directory\n", 2);
+		if (!data->error)
+		{
+			error_message(NULL, NULL);
+			ft_putstr_fd(filename, 2);
+			ft_putstr_fd(": No such file or directory\n", 2);
+		}
 		free(filename);
 		data->fd_in = -1;
 		data->fd_out = -1;
+		data->error = 1;
 		g_exit_number = 1;
-		if(!data->next && !data->prev)
-			return (1);
+	//	if(!data->next && !data->prev)
+	//		return (1);
 		return (0);
 	}
 	free(filename);
@@ -192,6 +196,7 @@ int	check_symbol(t_data *data, char *str, t_arg **prev, t_arg **cmd)
 {
 	int	i;
 	int	flag;
+//	t_arg	*next;
 
 	i = 0;
 	flag = get_flag(str, *cmd);
@@ -206,25 +211,30 @@ int	check_symbol(t_data *data, char *str, t_arg **prev, t_arg **cmd)
 			*cmd = ft_list_del(*cmd);
 		return (1);
 	}
-	while (*prev)
+	(void)prev;
+/*	while (*prev)
 	{
+		next = (*prev)->next;
 		free((*prev)->ac);
 		free(*prev);
-		*prev = (*prev)->next;
-	}
+		*prev = next;
+	}*/
 	return (2);
 }
 
 void	heredoc_error(t_arg **prev)
 {
+	t_arg	*next;
+
 	error_message(NULL, NULL);
 	ft_putstr_fd("syntax error near unexpected token `newline'\n", 2);
 	g_exit_number = 258;
 	while (*prev)
 	{
+		next = (*prev)->next;
 		free((*prev)->ac);
 		free(*prev);
-		*prev = (*prev)->next;
+		*prev = next;
 	}
 }
 
@@ -258,6 +268,12 @@ int	symbol_dollar(t_arg **cmd, t_arg **prev)
 {
 	if ((*cmd) && (*cmd)->ac[0] == '\0' && (*cmd)->next)
 		(*cmd) = ft_list_del((*cmd));
+	if ((*cmd)->ac[0] == '$' && (*cmd)->ac[1] != '\0' && (*cmd)->type != SINQ)
+	{
+		(*cmd) = ft_list_del(*cmd);
+		if (!*cmd)
+			return (1);
+	}
 	if (!*prev)
 		*prev = *cmd;
 	return (0);
@@ -358,7 +374,6 @@ void	ft_redirect_restore(t_data *data, int flag)
 	{
 		restore_in = dup(0);
 		restore_out = dup(1);
-		data->res_out = dup(1);
 		if (data->fd_in > 0)
 		{
 			dup2(data->fd_in, 0);

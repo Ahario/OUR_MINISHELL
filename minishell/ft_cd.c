@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 01:50:20 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/25 17:49:05 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/26 22:34:40 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,15 @@ static void	ft_cd_pwd(t_data *data)
 	free(pwd);
 }
 
+void	ft_cd_error(char *str)
+{
+	error_message("cd: ", NULL);
+	ft_putstr_fd(str, 2);
+	ft_putstr_fd(": ", 2);
+	ft_putstr_fd("No such file or directory\n", 2);
+	g_exit_number = 1;
+}
+
 void	ft_cd(t_data *data)
 {
 	t_arg	*arg;
@@ -109,11 +118,7 @@ void	ft_cd(t_data *data)
 	{
 		if (chdir(arg->ac) == -1)
 		{
-			error_message("cd: ", NULL);
-			ft_putstr_fd(arg->ac, 2);
-			ft_putstr_fd(": ", 2);
-			ft_putstr_fd("No such file or directory\n", 2);
-			g_exit_number = 1;
+			ft_cd_error(arg->ac);
 			return ;
 		}
 		ft_cd_pwd(data);

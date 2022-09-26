@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 14:46:05 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/26 17:50:14 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/26 22:35:37 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,18 +161,19 @@ char	*path_check(char *str)
 {
 	struct stat	buf;
 
-	if(stat(str, &buf))
+	if (stat(str, &buf))
 	{
 		error_message(NULL, NULL);
 		ft_putstr_fd(str, 2);
 		ft_putstr_fd(": No such file or directory\n", 2);
 		return (NULL);
 	}
-	if(S_ISDIR(buf.st_mode))
+	if (S_ISDIR(buf.st_mode))
 	{
 		error_message(NULL, NULL);
 		ft_putstr_fd(str, 2);
 		ft_putstr_fd(": is a directory\n", 2);
+		g_exit_number = 126;
 		return (NULL);
 	}
 	return (str);
@@ -184,7 +185,7 @@ char	*cmd_check(char *str, char **envp)
 	int			i;
 
 	i = 0;
-	if(str[0] == '.')
+	if (str[0] == '.')
 		return (path_check(str));
 	envp_path = ft_get_path(envp);
 	while (envp_path[i])
@@ -205,7 +206,7 @@ char	*cmd_check(char *str, char **envp)
 		i++;
 	}
 	free_split(envp_path);
-	cmd_error(str, 0);
+	str = path_check(str);
 	return (NULL);
 }
 
@@ -228,7 +229,6 @@ char	*ft_executable(t_data *data, int i)
 		{
 			free_split(envp_path);
 			return (path_check(ret));
-	//		return (ret);
 		}
 		free(ret);
 		i++;
@@ -274,7 +274,16 @@ void	ft_cmd_start(t_data *data)
 	if (!data->next)
 	{
 		if (!data->cmd)
+		{
+			ft_signal();
 			return ;
+		}
+		if (data->error)
+		{
+			g_exit_number = 1;
+			ft_signal();
+			return ;
+		}
 		if (data->cmd && ft_strchr(data->cmd->ac, ' '))
 		{
 			cmd_error(data->cmd->ac, 1);

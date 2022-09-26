@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/21 12:51:40 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/26 17:00:26 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/26 22:41:17 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,6 @@ void	last_cmd(t_data *data)
 	char	**arg;
 
 	cmd = NULL;
-//	printf ("last_out%d\n", data->fd_out);
-//	printf ("last_in%d\n", data->fd_in);
-//	printf ("last_pi_extrance%d\n", data->pipe[0]);
 	if (data->fd_in > 0)
 		close(data->pipe[0]);
 	else
@@ -58,9 +55,6 @@ void	first_cmd(t_data *data)
 
 	ret = 0;
 	cmd = NULL;
-//	printf ("fd_out%d\n", data->fd_out);
-//	printf ("fd_in%d\n", data->fd_in);
-//	printf ("fd_pip_exit%d\n", data->pipe[1]);
 	if (data->fd_out > 0)
 	{
 		close(data->pipe[1]);
@@ -96,11 +90,6 @@ void	child_cmd(t_data *data)
 	char	**arg;
 
 	cmd = NULL;
-
-//	printf ("chfd_in%d\n", data->fd_in);
-//	printf ("chfd_ouu%d\n", data->fd_out);
-//	printf ("chfd_pip_entrance%d\n", data->pipe[0]);
-//	printf ("chfd_pip_entrance%d\n", data->pipe[1]);
 	if (data->fd_in > 0)
 		close(data->prev->pipe[0]);
 	else
@@ -131,7 +120,7 @@ static void	ft_child_pipe(t_data *tem)
 {
 	if (tem && ft_strchr(tem->cmd->ac, ' '))
 	{
-		error_message(NULL , NULL);
+		error_message(NULL, NULL);
 		ft_putstr_fd(tem->cmd->ac, 2);
 		ft_putstr_fd(": command not found\n", 2);
 		exit(127);
@@ -139,7 +128,7 @@ static void	ft_child_pipe(t_data *tem)
 	if (!tem->next)
 		last_cmd(tem);
 	else if (!tem->prev)
-		first_cmd(tem);	
+		first_cmd(tem);
 	else if (tem->next)
 		child_cmd(tem);
 }
@@ -168,10 +157,9 @@ void	ft_pipe_cmd(t_data *data)
 {
 	int		pid;
 	t_data	*tem;
-	int	check;
+	int		check;
 
 	check = 0;
-
 	tem = data;
 	while (tem)
 	{
@@ -180,7 +168,8 @@ void	ft_pipe_cmd(t_data *data)
 			error_message(" Fork error\n", NULL);
 		if (pid == 0)
 		{
-	//		printf ("fd_in%d\n", data->fd_out);
+			if (tem->error)
+				exit(1);
 			ft_child_pipe(tem);
 		}
 		else
@@ -197,7 +186,7 @@ void	ft_pipe_cmd(t_data *data)
 		g_exit_number = 1;
 	else
 		g_exit_number = 0;
-	while(tem->prev)
+	while (tem->prev)
 	{
 		close(tem->pipe[0]);
 		tem = tem->prev;
@@ -214,9 +203,6 @@ void	ft_pipe_set(t_data *data, t_data *new)
 		error_message(" PIPE ERROR \n", NULL);
 	data->pipe = fd;
 	new->pipe = fd;
-//	data->fd_out = fd[1];
-//	new->fd_in = fd[0];
-//	new->fd_out = -1;
 }
 
 static t_data	*ft_pipe_list_utill(t_data	*data, t_arg *tem)
@@ -249,7 +235,7 @@ struct s_data	*ft_pipe_list(t_data *data)
 	while (data->cmd)
 	{
 		tem = data->cmd;
-		if (tem->ac[0] == '|' && tem->type != SINQ && tem->type != DOUQ\
+		if (tem->ac[0] == '|' && tem->type != SINQ && tem->type != DOUQ \
 				&& data->cmd->ac[1] != '|')
 		{
 			tem = ft_list_del_n(tem);
