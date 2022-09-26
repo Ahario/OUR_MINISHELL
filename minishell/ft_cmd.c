@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 14:46:05 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/26 15:09:39 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/26 17:50:14 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include "minishell.h"
 #include <errno.h>
 #include <string.h>
+#include <unistd.h>
 
 int	ft_list_len(t_arg *cmd)
 {
@@ -55,7 +56,10 @@ void	ft_child_cmd(t_data *data, char *cmd)
 	execve(cmd, arg, data->envp);
 	ft_redirect_restore(data, 1);
 	if (errno != 2)
-		ft_putstr_fd(strerror(errno), 2);
+	{
+		error_message(strerror(errno), NULL);
+		write(2, "\n", 1);
+	}
 	if (errno && errno != 2)
 		exit(errno);
 	exit (1);
@@ -153,6 +157,27 @@ static	int	cmd_check_utill(char *str, char *envp_path)
 	}
 }
 
+char	*path_check(char *str)
+{
+	struct stat	buf;
+
+	if(stat(str, &buf))
+	{
+		error_message(NULL, NULL);
+		ft_putstr_fd(str, 2);
+		ft_putstr_fd(": No such file or directory\n", 2);
+		return (NULL);
+	}
+	if(S_ISDIR(buf.st_mode))
+	{
+		error_message(NULL, NULL);
+		ft_putstr_fd(str, 2);
+		ft_putstr_fd(": is a directory\n", 2);
+		return (NULL);
+	}
+	return (str);
+}
+
 char	*cmd_check(char *str, char **envp)
 {
 	char		**envp_path;
@@ -160,7 +185,7 @@ char	*cmd_check(char *str, char **envp)
 
 	i = 0;
 	if(str[0] == '.')
-		return (str);
+		return (path_check(str));
 	envp_path = ft_get_path(envp);
 	while (envp_path[i])
 	{
@@ -202,7 +227,8 @@ char	*ft_executable(t_data *data, int i)
 		if (!stat(ret, &buf))
 		{
 			free_split(envp_path);
-			return (ret);
+			return (path_check(ret));
+	//		return (ret);
 		}
 		free(ret);
 		i++;

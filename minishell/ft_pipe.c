@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/21 12:51:40 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/26 16:36:43 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/26 17:00:26 by lee-sung         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	last_cmd(t_data *data)
 		arg = ft_arg_split(data->cmd);
 		execve(cmd, arg, data->envp);
 		ft_redirect_restore(data, 1);
-		if (errno != 2)
+		if (errno != 2 && errno != 14)
 			printf("%s\n", strerror(errno));
 		if (errno && errno != 2)
 			exit(errno);
