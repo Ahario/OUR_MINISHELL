@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/21 12:51:40 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/26 22:41:17 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/27 11:12:39 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,17 @@ void	last_cmd(t_data *data)
 	else
 	{
 		cmd = ft_executable(data, 0);
+		if (!cmd)
+			exit(g_exit_number);
 		arg = ft_arg_split(data->cmd);
 		execve(cmd, arg, data->envp);
 		ft_redirect_restore(data, 1);
 		if (errno != 2 && errno != 14)
+		{
 			printf("%s\n", strerror(errno));
-		if (errno && errno != 2)
-			exit(errno);
+			exit(127);
+		}
+		exit(errno);
 	}
 	ft_redirect_restore(data, 1);
 	exit(0);
@@ -141,15 +145,7 @@ static int	ft_parent_pipe(t_data *tem, int pid)
 	(void)pid;
 	close(tem->pipe[1]);
 	if (!tem->next)
-	{
-		if (check && errno == 2)
-			g_exit_number = 1;
-		else if (check)
-			g_exit_number = 127;
-		else
-			g_exit_number = 0;
 		return (1);
-	}
 	return (0);
 }
 
@@ -180,12 +176,7 @@ void	ft_pipe_cmd(t_data *data)
 		}
 	}
 	waitpid(pid, &check, 0);
-	if (errno == 2 && check)
-		g_exit_number = 2;
-	else if (check)
-		g_exit_number = 1;
-	else
-		g_exit_number = 0;
+	g_exit_number = WEXITSTATUS(check);
 	while (tem->prev)
 	{
 		close(tem->pipe[0]);

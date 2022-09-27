@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/01 21:24:56 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/25 17:39:37 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/27 10:52:54 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,13 +255,18 @@ void	ft_export(t_data *data)
 	tem = data->cmd->next;
 	while (tem)
 	{
-		if (ft_check_key(tem->ac, 1))
+		while (ft_check_key(tem->ac, 1))
 		{
 			error_message("export: ", tem->ac);
 			ft_putstr_fd(": ", 2);
 			ft_putstr_fd("not a valid identifier\n", 2);
-			g_exit_number = 1;
-			return ;
+			if(tem->next)
+				tem = tem->next;
+			else
+			{
+				g_exit_number = 1;
+				return ;
+			}
 		}
 		add_export(data, tem);
 		tem = tem->next;
