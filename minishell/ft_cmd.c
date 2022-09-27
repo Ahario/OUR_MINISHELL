@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 14:46:05 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 15:24:20 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/27 15:49:51 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,7 +169,6 @@ char	*path_check(char *str)
 
 	if (stat(str, &buf))
 	{
-		printf ("111\n");
 		error_message(NULL, NULL);
 		ft_putstr_fd(str, 2);
 		ft_putstr_fd(": No such file or directory\n", 2);

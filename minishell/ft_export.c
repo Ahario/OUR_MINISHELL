@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/01 21:24:56 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 14:30:09 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/27 15:47:23 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,7 +264,7 @@ void	ft_export(t_data *data)
 				tem = tem->next;
 			else
 			{
-				g_exit_number = 2;
+				g_exit_number = 1;
 				return ;
 			}
 		}
