@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/29 14:40:03 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/23 23:47:41 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/27 17:21:52 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "minishell.h"
 #include <sys/signal.h>
 
-static void	ft_ctrl_c(int sig)
+void	ft_ctrl_c(int sig)
 {
 	(void)sig;
 	write(1, "\n", 1);

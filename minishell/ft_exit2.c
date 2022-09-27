@@ -1,42 +1,50 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pwd.c                                           :+:      :+:    :+:   */
+/*   ft_exit2.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/13 01:19:45 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 17:36:06 by sunglee          ###   ########.fr       */
+/*   Created: 2022/09/27 17:03:08 by sunglee           #+#    #+#             */
+/*   Updated: 2022/09/27 17:04:12 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_envp_pwd(char **envp)
+void	exit2(int flag)
 {
-	char	*val;
-	int		i;
-
-	i = 0;
-	while (envp && ft_strncmp(envp[i], "PWD", 3))
-		i++;
-	val = find_value(envp[i]);
-	if (val)
-	{
-		printf("%s\n", val);
-		free(val);
-	}
+	if (!flag)
+		printf("exit\n");
+	exit(EXIT_SUCCESS);
 }
 
-void	ft_pwd(t_data *data)
+int	count_total(t_arg *head)
 {
-	char	*str;
+	int		i;
+	t_arg	*tem;
 
-	str = getcwd(NULL, 1024);
-	if (str &&!str[0])
-		ft_envp_pwd(data->envp);
-	else
-		printf ("%s\n", str);
-	free (str);
-	return ;
+	i = 0;
+	tem = head;
+	while (tem != NULL)
+	{
+		i++;
+		tem = tem->next;
+	}
+	return (i);
+}
+
+void	error_message(char *str, char *des)
+{
+	rl_on_new_line();
+	ft_putstr_fd("MINISHELL: ", 2);
+	if (str)
+		ft_putstr_fd(str, 2);
+	if (des)
+	{
+		ft_putstr_fd("`", 2);
+		ft_putstr_fd(des, 2);
+		ft_putstr_fd("'", 2);
+	}
+	g_exit_number = 127;
 }

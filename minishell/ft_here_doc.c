@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/20 15:13:19 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 15:17:31 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/27 17:33:36 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,26 +16,6 @@
 #include <sys/signal.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
-void	ft_signal_kill(int sig)
-{
-	(void)sig;
-	write(1, "\n", 1);
-	signal(SIGINT, SIG_IGN);
-}
-
-void	ft_signal_cltr_c(int sig)
-{
-	(void)sig;
-	write(1, "\b\b\b\b\b\b\b\b\b\b\b\b", 12);
-	exit(1);
-}
-
-void	ft_signal_here(void)
-{
-	signal(SIGINT, ft_signal_cltr_c);
-	signal(SIGQUIT, ft_signal_kill);
-}
 
 int	ft_child_here(int fd[2], char *stop)
 {
@@ -60,7 +40,7 @@ int	ft_child_here(int fd[2], char *stop)
 	exit(0);
 }
 
-static int	ft_here_fork(t_data *data, char *stop, int check)
+int	ft_here_fork(t_data *data, char *stop, int check)
 {
 	int	fd[2];
 	int	fork_fd;

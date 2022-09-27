@@ -1,42 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pwd.c                                           :+:      :+:    :+:   */
+/*   ft_cd2.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/13 01:19:45 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 17:36:06 by sunglee          ###   ########.fr       */
+/*   Created: 2022/09/27 16:57:20 by sunglee           #+#    #+#             */
+/*   Updated: 2022/09/27 17:00:55 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_envp_pwd(char **envp)
+char	*get_old_pwd(t_data *data)
 {
-	char	*val;
-	int		i;
+	int	i;
 
 	i = 0;
-	while (envp && ft_strncmp(envp[i], "PWD", 3))
+	while (data->envp[i] && ft_strncmp(data->envp[i], "PWD", 3))
 		i++;
-	val = find_value(envp[i]);
-	if (val)
-	{
-		printf("%s\n", val);
-		free(val);
-	}
+	return (data->envp[i]);
 }
 
-void	ft_pwd(t_data *data)
+void	put_old_pwd(t_data *data, char *old)
 {
-	char	*str;
+	int		i;
+	char	*val;
 
-	str = getcwd(NULL, 1024);
-	if (str &&!str[0])
-		ft_envp_pwd(data->envp);
-	else
-		printf ("%s\n", str);
-	free (str);
-	return ;
+	i = 0;
+	while (data->envp[i] && ft_strncmp(data->envp[i], "OLDPWD", 6))
+		i++;
+	val = find_value(old);
+	free(old);
+	old = ft_strjoin_normal("OLDPWD=", val);
+	free(val);
+	free(data->envp[i]);
+	data->envp[i] = old;
 }

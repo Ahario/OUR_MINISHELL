@@ -6,40 +6,14 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 01:50:20 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 15:08:07 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/27 17:28:58 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/libft.h"
 #include "minishell.h"
 
-char	*get_old_pwd(t_data *data)
-{
-	int	i;
-
-	i = 0;
-	while (data->envp[i] && ft_strncmp(data->envp[i], "PWD", 3))
-		i++;
-	return (data->envp[i]);
-}
-
-void	put_old_pwd(t_data *data, char *old)
-{
-	int		i;
-	char	*val;
-
-	i = 0;
-	while (data->envp[i] && ft_strncmp(data->envp[i], "OLDPWD", 6))
-		i++;
-	val = find_value(old);
-	free(old);
-	old = ft_strjoin_normal("OLDPWD=", val);
-	free(val);
-	free(data->envp[i]);
-	data->envp[i] = old;
-}
-
-static int	cd_error(char *val)
+int	cd_error(char *val)
 {
 	if (val)
 		free(val);
@@ -76,7 +50,7 @@ int	ft_get_pwd(t_data *data, char *key, int len, char *val)
 	return (0);
 }
 
-static void	ft_cd_pwd(t_data *data)
+void	ft_cd_pwd(t_data *data)
 {
 	int		i;
 	char	*pwd;

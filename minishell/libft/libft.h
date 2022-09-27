@@ -6,7 +6,7 @@
 /*   By: hyeo <hyeo@student.42seoul.kr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/16 14:45:32 by hyeo              #+#    #+#             */
-/*   Updated: 2022/09/25 16:36:34 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/27 18:30:31 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,16 @@ int		ft_tolower(int c);
 void	*ft_calloc(size_t count, size_t size);
 char	*ft_strdup(const char *s1);
 char	**ft_strdup_2(char **s1);
+void	hs_create_empty(char *s);
 
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 char	*ft_strjoin(char *s1, char *s2);
 char	*ft_strjoin_free(char const *s1, char const *s2);
 char	*ft_strjoin_keyval(char const *s1, char const *s2);
+char	*ft_keyval_utill(char const *s1, char const *s2, char *temp);
 char	*ft_strjoin_normal(char *s1, char *s2);
 char	*ft_strjoin_flag(char const *s1, char const *s2, int flag);
+void	free_both(char const *s1, char const *s2);
 char	*ft_strtrim(char const *s1, char const *set);
 char	**ft_split(char const *s, char *c);
 char	*ft_itoa(int n);

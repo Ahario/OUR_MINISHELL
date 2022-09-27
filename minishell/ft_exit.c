@@ -6,49 +6,12 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/30 14:05:56 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 16:20:32 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/27 17:26:38 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "libft/libft.h"
 #include "minishell.h"
 #include <readline/history.h>
-
-void	exit2(int flag)
-{
-	if (!flag)
-		printf("exit\n");
-	exit(EXIT_SUCCESS);
-}
-
-int	count_total(t_arg *head)
-{
-	int		i;
-	t_arg	*tem;
-
-	i = 0;
-	tem = head;
-	while (tem != NULL)
-	{
-		i++;
-		tem = tem->next;
-	}
-	return (i);
-}
-
-void	error_message(char *str, char *des)
-{
-	rl_on_new_line();
-	ft_putstr_fd("MINISHELL: ", 2);
-	if (str)
-		ft_putstr_fd(str, 2);
-	if (des)
-	{
-		ft_putstr_fd("`", 2);
-		ft_putstr_fd(des, 2);
-		ft_putstr_fd("'", 2);
-	}
-	g_exit_number = 127;
-}
 
 void	ft_exit_error(int flag)
 {
@@ -86,7 +49,7 @@ int	ft_atoi_exit(char *str, int i, int flag)
 	return (sign * ret);
 }
 
-static void	exit_numeric_check(char *str, int flag)
+void	exit_numeric_check(char *str, int flag)
 {
 	int	j;
 

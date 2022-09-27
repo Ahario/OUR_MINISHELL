@@ -1,42 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_pwd.c                                           :+:      :+:    :+:   */
+/*   ft_signal2.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/13 01:19:45 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 17:36:06 by sunglee          ###   ########.fr       */
+/*   Created: 2022/09/27 17:07:37 by sunglee           #+#    #+#             */
+/*   Updated: 2022/09/27 17:08:21 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_envp_pwd(char **envp)
+void	ft_signal_kill(int sig)
 {
-	char	*val;
-	int		i;
-
-	i = 0;
-	while (envp && ft_strncmp(envp[i], "PWD", 3))
-		i++;
-	val = find_value(envp[i]);
-	if (val)
-	{
-		printf("%s\n", val);
-		free(val);
-	}
+	(void)sig;
+	write(1, "\n", 1);
+	signal(SIGINT, SIG_IGN);
 }
 
-void	ft_pwd(t_data *data)
+void	ft_signal_cltr_c(int sig)
 {
-	char	*str;
+	(void)sig;
+	write(1, "\b\b\b\b\b\b\b\b\b\b\b\b", 12);
+	exit(1);
+}
 
-	str = getcwd(NULL, 1024);
-	if (str &&!str[0])
-		ft_envp_pwd(data->envp);
-	else
-		printf ("%s\n", str);
-	free (str);
-	return ;
+void	ft_signal_here(void)
+{
+	signal(SIGINT, ft_signal_cltr_c);
+	signal(SIGQUIT, ft_signal_kill);
 }

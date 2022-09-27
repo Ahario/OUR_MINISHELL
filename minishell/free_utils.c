@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 15:38:47 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/23 23:51:10 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/27 17:45:18 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	free_split(char **str)
 	str = NULL;
 }
 
-struct s_arg	*ft_list_del(t_arg *cmd)
+t_arg	*ft_list_del(t_arg *cmd)
 {
 	t_arg	*prev;
 	t_arg	*next;
@@ -41,7 +41,7 @@ struct s_arg	*ft_list_del(t_arg *cmd)
 	return (cmd);
 }
 
-struct s_arg	*ft_list_del_n(t_arg *cmd)
+t_arg	*ft_list_del_n(t_arg *cmd)
 {
 	t_arg	*prev;
 	t_arg	*next;
