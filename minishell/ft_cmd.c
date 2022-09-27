@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/16 14:46:05 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 15:49:51 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/27 16:14:47 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,6 +185,20 @@ char	*path_check(char *str)
 	return (str);
 }
 
+char	*ft_cmd_return(char	*str, char *envp, char **envp_path)
+{
+	if (cmd_check_utill(str, envp))
+	{
+		free_split(envp_path);
+		return (NULL);
+	}
+	else
+	{
+		free_split(envp_path);
+		return (str);
+	}
+}
+
 char	*cmd_check(char *str, char **envp)
 {
 	char		**envp_path;
@@ -197,18 +211,7 @@ char	*cmd_check(char *str, char **envp)
 	while (envp_path[i])
 	{
 		if (!ft_strncmp(envp_path[i], str, ft_strlen(envp_path[i])))
-		{
-			if (cmd_check_utill(str, envp_path[i]))
-			{
-				free_split(envp_path);
-				return (NULL);
-			}
-			else
-			{
-				free_split(envp_path);
-				return (str);
-			}
-		}
+			return (ft_cmd_return(str, envp_path[i], envp_path));
 		i++;
 	}
 	free_split(envp_path);
@@ -269,27 +272,34 @@ void	ft_one_cmd(t_data *data, int pid)
 	}
 }
 
+int	ft_cmd_error(t_data *data)
+{
+	if (!data->cmd)
+	{
+		ft_signal();
+		return (1);
+	}
+	if (data->error)
+	{
+		g_exit_number = 1;
+		ft_signal();
+		return (1);
+	}
+	if (data->cmd && ft_strchr(data->cmd->ac, ' '))
+	{
+		cmd_error(data->cmd->ac, 1);
+		return (1);
+	}
+	return (0);
+}
+
 void	ft_cmd_start(t_data *data)
 {
 	ft_signal_cmd();
 	if (!data->next)
 	{
-		if (!data->cmd)
-		{
-			ft_signal();
+		if (ft_cmd_error(data))
 			return ;
-		}
-		if (data->error)
-		{
-			g_exit_number = 1;
-			ft_signal();
-			return ;
-		}
-		if (data->cmd && ft_strchr(data->cmd->ac, ' '))
-		{
-			cmd_error(data->cmd->ac, 1);
-			return ;
-		}
 		if (data->cmd && !check_built(data, data->cmd->ac))
 		{
 			ft_redirect_restore(data, 0);

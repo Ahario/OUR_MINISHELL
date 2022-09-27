@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 12:04:06 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 15:18:43 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/27 16:45:20 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,21 @@ static int	filename_error(char *str, int *j)
 	return (0);
 }
 
+void	infile_error_print(t_data *data, char *filename)
+{
+	if (!data->error)
+	{
+		error_message(NULL, NULL);
+		ft_putstr_fd(filename, 2);
+		ft_putstr_fd(": No such file or directory\n", 2);
+	}
+	free(filename);
+	data->fd_in = -1;
+	data->fd_out = -1;
+	data->error = 1;
+	g_exit_number = 1;
+}
+
 int	infilename_check(t_data *data, char *str, int *i, int flag)
 {
 	char	*filename;
@@ -116,19 +131,7 @@ int	infilename_check(t_data *data, char *str, int *i, int flag)
 		filename[size--] = str[--j];
 	if (ft_open_flag(data, filename, flag) == -1)
 	{
-		if (!data->error)
-		{
-			error_message(NULL, NULL);
-			ft_putstr_fd(filename, 2);
-			ft_putstr_fd(": No such file or directory\n", 2);
-		}
-		free(filename);
-		data->fd_in = -1;
-		data->fd_out = -1;
-		data->error = 1;
-		g_exit_number = 1;
-	//	if(!data->next && !data->prev)
-	//		return (1);
+		infile_error_print(data, filename);
 		return (0);
 	}
 	free(filename);
@@ -196,7 +199,6 @@ int	check_symbol(t_data *data, char *str, t_arg **prev, t_arg **cmd)
 {
 	int	i;
 	int	flag;
-//	t_arg	*next;
 
 	i = 0;
 	flag = get_flag(str, *cmd);

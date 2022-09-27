@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/08 17:17:57 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 15:11:16 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/27 16:49:12 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,13 @@ char	**unset_envp(char	**envp, int i)
 	return (ret);
 }
 
+void	ft_unset_error(char *ac)
+{
+	error_message("export: ", ac);
+	ft_putstr_fd(": not a vaild identifier\n", 2);
+	g_exit_number = 1;
+}
+
 void	ft_unset(t_data *data)
 {
 	char	**envp;
@@ -51,9 +58,7 @@ void	ft_unset(t_data *data)
 		envp = data->envp;
 		if (ft_check_key(tem->ac, 0))
 		{
-			error_message("export: ", tem->ac);
-			ft_putstr_fd(": not a vaild identifier\n", 2);
-			g_exit_number = 1;
+			ft_unset_error(tem->ac);
 			return ;
 		}
 		while (envp[i] && ft_strncmp(envp[i], tem->ac, ft_strlen(tem->ac)))

@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/21 12:51:40 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 15:35:24 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/27 16:40:35 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,30 @@
 #include <string.h>
 #include <errno.h>
 
-void	last_cmd(t_data *data)
+void	ft_pipe_exec(t_data *data)
 {
 	char	*cmd;
 	char	**arg;
 
-	cmd = NULL;
+	cmd = ft_executable(data, 0);
+	if (!cmd)
+		exit(g_exit_number);
+	arg = ft_arg_split(data->cmd);
+	execve(cmd, arg, data->envp);
+	ft_redirect_restore(data, 1);
+	if (errno != 2 && errno != 14)
+	{
+		error_message(cmd, NULL);
+		write(2, ": ", 2);
+		ft_putstr_fd(strerror(errno), 2);
+		write(2, "\n", 1);
+	}
+	if (errno == 13 || errno == 14 || errno == 20)
+		exit(126);
+}
+
+void	last_cmd(t_data *data)
+{
 	if (data->fd_in > 0)
 		close(data->pipe[0]);
 	else
@@ -32,36 +50,18 @@ void	last_cmd(t_data *data)
 	{
 		play_built(data, data->cmd->ac);
 		ft_redirect_restore(data, 1);
-		if(g_exit_number == 1 || g_exit_number == 2)
+		if (g_exit_number == 1 || g_exit_number == 2)
 			exit(1);
 	}
 	else
 	{
-		cmd = ft_executable(data, 0);
-		if (!cmd)
-			exit(g_exit_number);
-		arg = ft_arg_split(data->cmd);
-		execve(cmd, arg, data->envp);
-		ft_redirect_restore(data, 1);
-		if (errno != 2 && errno != 14)
-		{
-			error_message(cmd, NULL);
-			write(2, ": ", 2);
-			ft_putstr_fd(strerror(errno), 2);
-			write(2, "\n", 1);
-		}
-		if (errno == 13 || errno == 14 || errno == 20)
-			exit(126);
+		ft_pipe_exec(data);
 	}
 	exit(0);
 }
 
 void	first_cmd(t_data *data)
 {
-	char	*cmd;
-	char	**arg;
-
-	cmd = NULL;
 	if (data->fd_out > 0)
 		close(data->pipe[1]);
 	else
@@ -72,36 +72,18 @@ void	first_cmd(t_data *data)
 	{
 		play_built(data, data->cmd->ac);
 		ft_redirect_restore(data, 1);
-		if(g_exit_number == 1 || g_exit_number == 2)
+		if (g_exit_number == 1 || g_exit_number == 2)
 			exit(1);
 	}
 	else
 	{
-		cmd = ft_executable(data, 0);
-		if (!cmd)
-			exit(g_exit_number);
-		arg = ft_arg_split(data->cmd);
-		execve(cmd, arg, data->envp);
-		ft_redirect_restore(data, 1);
-		if (errno != 2 && errno != 14)
-		{
-			error_message(cmd, NULL);
-			write(2, ": ", 2);
-			ft_putstr_fd(strerror(errno), 2);
-			write(2, "\n", 1);
-		}
-		if (errno == 13 || errno == 14 || errno == 20)
-			exit(126);
+		ft_pipe_exec(data);
 	}
 	exit(0);
 }
 
 void	child_cmd(t_data *data)
 {
-	char	*cmd;
-	char	**arg;
-
-	cmd = NULL;
 	if (data->fd_in > 0)
 		close(data->prev->pipe[0]);
 	else
@@ -117,24 +99,12 @@ void	child_cmd(t_data *data)
 	{
 		play_built(data, data->cmd->ac);
 		ft_redirect_restore(data, 1);
-		if(g_exit_number == 1 || g_exit_number == 2)
+		if (g_exit_number == 1 || g_exit_number == 2)
 			exit(1);
 	}
 	else
 	{
-		cmd = ft_executable(data, 0);
-		arg = ft_arg_split(data->cmd);
-		execve(cmd, arg, data->envp);
-		ft_redirect_restore(data, 1);
-		if (errno != 2 && errno != 14)
-		{
-			error_message(cmd, NULL);
-			write(2, ": ", 2);
-			ft_putstr_fd(strerror(errno), 2);
-			write(2, "\n", 1);
-		}
-		if (errno == 13 || errno == 14 || errno == 20)
-			exit(126);
+		ft_pipe_exec(data);
 	}
 	exit(0);
 }
@@ -168,6 +138,25 @@ static int	ft_parent_pipe(t_data *tem, int pid)
 	return (0);
 }
 
+int	ft_pipe_fork(t_data **tem, int pid)
+{
+	if (pid < 0)
+		error_message(" Fork error\n", NULL);
+	if (pid == 0)
+	{
+		if ((*tem)->error)
+			exit(1);
+		ft_child_pipe(*tem);
+	}
+	else
+	{
+		if (ft_parent_pipe(*tem, pid))
+			return (1);
+		*tem = (*tem)->next;
+	}
+	return (0);
+}
+
 void	ft_pipe_cmd(t_data *data)
 {
 	int		pid;
@@ -179,20 +168,8 @@ void	ft_pipe_cmd(t_data *data)
 	while (tem)
 	{
 		pid = fork();
-		if (pid < 0)
-			error_message(" Fork error\n", NULL);
-		if (pid == 0)
-		{
-			if (tem->error)
-				exit(1);
-			ft_child_pipe(tem);
-		}
-		else
-		{
-			if (ft_parent_pipe(tem, pid))
-				break ;
-			tem = tem->next;
-		}
+		if (ft_pipe_fork(&tem, pid))
+			break ;
 	}
 	waitpid(pid, &check, 0);
 	g_exit_number = WEXITSTATUS(check);

@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/30 14:05:56 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 12:36:40 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/27 16:20:32 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "libft/libft.h"
@@ -50,6 +50,16 @@ void	error_message(char *str, char *des)
 	g_exit_number = 127;
 }
 
+void	ft_exit_error(int flag)
+{
+	if (!flag)
+		ft_putstr_fd("exit\n", 1);
+	error_message("exit: ", NULL);
+	ft_putstr_fd("numeric argument required\n", 2);
+	g_exit_number = 255;
+	exit(255);
+}
+
 int	ft_atoi_exit(char *str, int i, int flag)
 {
 	int					sign;
@@ -69,14 +79,9 @@ int	ft_atoi_exit(char *str, int i, int flag)
 	if ((ret > 9223372036854775807u && sign == 1) \
 			|| (ret > 9223372036854775808u && sign == -1))
 	{
-		if(!flag)
-			ft_putstr_fd("exit\n", 1);
-		error_message("exit: ", NULL);
-		ft_putstr_fd("numeric argument required\n", 2);
-		g_exit_number = 255;
-		exit(255);
+		ft_exit_error(flag);
 	}
-	if(!flag)
+	if (!flag)
 		ft_putstr_fd("exit\n", 1);
 	return (sign * ret);
 }
@@ -96,12 +101,7 @@ static void	exit_numeric_check(char *str, int flag)
 		j++;
 	if (j != (int)ft_strlen(str))
 	{
-		if(!flag)
-			printf("exit\n");
-		error_message("exit: ", NULL);
-		ft_putstr_fd("numeric argument required\n", 2);
-		g_exit_number = 255;
-		exit(255);
+		ft_exit_error(flag);
 	}
 }
 

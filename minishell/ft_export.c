@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/01 21:24:56 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 15:47:23 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/27 16:26:14 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,6 +243,21 @@ static void	add_export(t_data *data, t_arg *tem)
 		data->envp = ft_new_envp(data->envp, key, NULL);
 }
 
+int	ft_export_error(t_arg **tem)
+{
+	error_message("export: ", (*tem)->ac);
+	ft_putstr_fd(": ", 2);
+	ft_putstr_fd("not a valid identifier\n", 2);
+	if ((*tem)->next)
+		(*tem) = (*tem)->next;
+	else
+	{
+		g_exit_number = 1;
+		return (1);
+	}
+	return (0);
+}
+
 void	ft_export(t_data *data)
 {
 	t_arg	*tem;
@@ -257,16 +272,8 @@ void	ft_export(t_data *data)
 	{
 		while (ft_check_key(tem->ac, 1))
 		{
-			error_message("export: ", tem->ac);
-			ft_putstr_fd(": ", 2);
-			ft_putstr_fd("not a valid identifier\n", 2);
-			if(tem->next)
-				tem = tem->next;
-			else
-			{
-				g_exit_number = 1;
+			if (ft_export_error(&tem))
 				return ;
-			}
 		}
 		add_export(data, tem);
 		tem = tem->next;
