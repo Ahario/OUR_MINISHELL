@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/15 12:04:06 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/26 22:43:14 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/27 15:18:43 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,13 +212,6 @@ int	check_symbol(t_data *data, char *str, t_arg **prev, t_arg **cmd)
 		return (1);
 	}
 	(void)prev;
-/*	while (*prev)
-	{
-		next = (*prev)->next;
-		free((*prev)->ac);
-		free(*prev);
-		*prev = next;
-	}*/
 	return (2);
 }
 
@@ -268,7 +261,8 @@ int	symbol_dollar(t_arg **cmd, t_arg **prev)
 {
 	if ((*cmd) && (*cmd)->ac[0] == '\0' && (*cmd)->next)
 		(*cmd) = ft_list_del((*cmd));
-	if ((*cmd)->ac[0] == '$' && (*cmd)->ac[1] != '\0' && (*cmd)->type != SINQ)
+	if ((*cmd)->ac[0] == '$' && (*cmd)->ac[1] != '\0' && (*cmd)->type != SINQ \
+			&& (*cmd)->type != DOLLAR)
 	{
 		(*cmd) = ft_list_del(*cmd);
 		if (!*cmd)

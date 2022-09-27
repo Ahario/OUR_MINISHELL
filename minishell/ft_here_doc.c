@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/20 15:13:19 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/25 16:56:33 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/27 15:17:31 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ void	ft_here_doc(t_data *data, char *str, int *i, char *stop)
 	{
 		error_message(NULL, NULL);
 		ft_putstr_fd("syntax error near unexpected token 'newline'\n", 2);
+		g_exit_number = 258;
 		return ;
 	}
 	if (!ft_here_fork(data, stop, 0))

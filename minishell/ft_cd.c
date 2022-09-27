@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 01:50:20 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/26 22:34:40 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/27 15:08:07 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ static int	cd_error(char *val)
 	ft_putstr_fd(val, 2);
 	ft_putstr_fd(": ", 2);
 	ft_putstr_fd("No such file or directory\n", 2);
+	g_exit_number = 1;
 	return (1);
 }
 

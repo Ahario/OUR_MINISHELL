@@ -384,6 +384,7 @@ char	*hs_change_exit_number(char *str, int i)
 	temp2 = NULL;
 	temp2 = ft_itoa(g_exit_number);
 	temp = get_full_exit(temp2, &str[i + 2]);
+	printf("sorry sorry %s\n", temp);
 	free(temp2);
 	return (temp);
 }
@@ -409,22 +410,6 @@ int	hs_for_only_ds(char *s, int i)
 	return (1);
 }
 
-char *hs_change_pid(char *str, int i)
-{
-	int 	j;
-	char	*temp;
-	char	*temp2;
-
-	temp = NULL;
-	temp2 = NULL;
-	j = 0;
-	j = getpid();
-	temp2 = ft_itoa(j);
-	temp = get_full_exit(temp2, &str[i + 2]);
-	free(temp2);
-	return (temp);
-}
-
 char	*replace_dollar_sign(char *st, t_data *data)
 {
 	char	*temp;
@@ -438,8 +423,6 @@ char	*replace_dollar_sign(char *st, t_data *data)
 		{
 			if (st[i] == '$' && st[i + 1] == '?')
 				temp = hs_change_exit_number(&st[i], i);
-			else if (st[i] == '$' && st[i + 1] == '$')
-				temp = hs_change_pid(&st[i], i); 
 			else if (hs_for_only_ds(&st[i], i) == 0)
 			{
 				temp = malloc(sizeof(char) * (2));
@@ -519,13 +502,11 @@ int	before_r_ds_parse(char *str, t_data *data)
 	return (j);
 }
 
-int	for_replace_ds_parse(char *c, int k)
+int	for_replace_ds_parse(char *c)
 {
 	int	i;
 
-	i = k;
-	if (c[k - 1] == '$' && c[k] == '$')
-		return (0);
+	i = 0;
 	if (c[i] != '\"' && c[i] != '\'' && c[i] != '\0'
 		&& c[i] != ' ' && c[i] != '$')
 		return (0);
@@ -632,8 +613,6 @@ char	*replace_dollar_sign_dq(char *st, t_data *data)
 		{
 			if (st[i] == '$' && st[i + 1] == '?')
 				temp = hs_change_exit_number(&st[i], i);
-			else if (st[i] == '$' && st[i + 1] == '$')
-				temp = hs_change_pid(&st[i], i); 
 			else if (st[i] == '$' && st[i + 1] == '\0')
 			{
 				temp = malloc(sizeof(char) * (2));
@@ -682,7 +661,7 @@ void	add_i(int *i, char *str)
 
 	k = 0;
 	k++;
-	while (for_replace_ds_parse(str, k) == 0)
+	while (for_replace_ds_parse(&str[k]) == 0)
 		k++;
 	*i += k;
 }

@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/08 17:17:57 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/25 16:44:48 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/27 15:11:16 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ void	ft_unset(t_data *data)
 		if (ft_check_key(tem->ac, 0))
 		{
 			error_message("export: ", tem->ac);
-			ft_putstr_fd(" not a vaild identifier\n", 2);
+			ft_putstr_fd(": not a vaild identifier\n", 2);
+			g_exit_number = 1;
 			return ;
 		}
 		while (envp[i] && ft_strncmp(envp[i], tem->ac, ft_strlen(tem->ac)))

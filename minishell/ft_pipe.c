@@ -6,7 +6,7 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/21 12:51:40 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/27 11:12:39 by sunglee          ###   ########.fr       */
+/*   Updated: 2022/09/27 15:35:24 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,9 @@ void	last_cmd(t_data *data)
 	if (data->cmd && !check_built(data, data->cmd->ac))
 	{
 		play_built(data, data->cmd->ac);
+		ft_redirect_restore(data, 1);
+		if(g_exit_number == 1 || g_exit_number == 2)
+			exit(1);
 	}
 	else
 	{
@@ -42,12 +45,14 @@ void	last_cmd(t_data *data)
 		ft_redirect_restore(data, 1);
 		if (errno != 2 && errno != 14)
 		{
-			printf("%s\n", strerror(errno));
-			exit(127);
+			error_message(cmd, NULL);
+			write(2, ": ", 2);
+			ft_putstr_fd(strerror(errno), 2);
+			write(2, "\n", 1);
 		}
-		exit(errno);
+		if (errno == 13 || errno == 14 || errno == 20)
+			exit(126);
 	}
-	ft_redirect_restore(data, 1);
 	exit(0);
 }
 
@@ -55,36 +60,39 @@ void	first_cmd(t_data *data)
 {
 	char	*cmd;
 	char	**arg;
-	int		ret;
 
-	ret = 0;
 	cmd = NULL;
 	if (data->fd_out > 0)
-	{
 		close(data->pipe[1]);
-	}
 	else
-	{
 		data->fd_out = data->pipe[1];
-	}
 	data->pipe[1] = -1;
 	ft_redirect_restore(data, 0);
 	if (data->cmd && !check_built(data, data->cmd->ac))
 	{
 		play_built(data, data->cmd->ac);
+		ft_redirect_restore(data, 1);
+		if(g_exit_number == 1 || g_exit_number == 2)
+			exit(1);
 	}
 	else
 	{
 		cmd = ft_executable(data, 0);
+		if (!cmd)
+			exit(g_exit_number);
 		arg = ft_arg_split(data->cmd);
-		ret = execve(cmd, arg, data->envp);
-		free(cmd);
-		free(arg);
-		if (ret == -1)
-			ret = 1;
-		printf("%s\n", strerror(errno));
+		execve(cmd, arg, data->envp);
+		ft_redirect_restore(data, 1);
+		if (errno != 2 && errno != 14)
+		{
+			error_message(cmd, NULL);
+			write(2, ": ", 2);
+			ft_putstr_fd(strerror(errno), 2);
+			write(2, "\n", 1);
+		}
+		if (errno == 13 || errno == 14 || errno == 20)
+			exit(126);
 	}
-	ft_redirect_restore(data, 1);
 	exit(0);
 }
 
@@ -106,17 +114,28 @@ void	child_cmd(t_data *data)
 	data->pipe[1] = -1;
 	ft_redirect_restore(data, 0);
 	if (data->cmd && !check_built(data, data->cmd->ac))
+	{
 		play_built(data, data->cmd->ac);
+		ft_redirect_restore(data, 1);
+		if(g_exit_number == 1 || g_exit_number == 2)
+			exit(1);
+	}
 	else
 	{
 		cmd = ft_executable(data, 0);
 		arg = ft_arg_split(data->cmd);
 		execve(cmd, arg, data->envp);
-		free(cmd);
-		free(arg);
-		exit(errno);
+		ft_redirect_restore(data, 1);
+		if (errno != 2 && errno != 14)
+		{
+			error_message(cmd, NULL);
+			write(2, ": ", 2);
+			ft_putstr_fd(strerror(errno), 2);
+			write(2, "\n", 1);
+		}
+		if (errno == 13 || errno == 14 || errno == 20)
+			exit(126);
 	}
-	ft_redirect_restore(data, 1);
 	exit(0);
 }
 

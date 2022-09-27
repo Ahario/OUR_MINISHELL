@@ -38,7 +38,7 @@ typedef struct s_data{
 enum	e_pars{
     NORM, SPCE, SINQ, DOUQ, BSLA, DOLR,
     PIPE, DPIP, SEMC, DSEM,
-    RDRT, DRGT
+    RDRT, DRGT, DOLLAR
 };
 
 int	g_exit_number;

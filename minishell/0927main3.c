@@ -88,6 +88,7 @@ void	play_built(t_data *data, char *str)
 	return ;
 }
 
+
 int	check_built(t_data *data, char *str)
 {
 	(void)data;
@@ -236,29 +237,11 @@ void	assign_parse(t_data *data)
 			assign_redirect(&curr);
 		else if (check_pipe(curr->ac) == 0)
 			assign_pipe(&curr);
+		else
+			assign_norm(&curr);
 		curr = curr->next;
 	}
 	parse_bigpart(data);
-}
-
-int	check_type(char *str, t_arg *curr)
-{
-	int	i;
-
-	i = 0;
-	if (curr->type != SINQ)
-	{
-		while (str[i] != '\0')
-		{
-			if (str[i] == '$' && i > 0)
-			{
-				if (str[i - 1] == '\"' && str[i + 1] == '\"')
-					return (DOLLAR);
-			}
-			i++;
-		}
-	}
-	return (curr->type);
 }
 
 void	parse_bigpart(t_data *data)
@@ -268,15 +251,16 @@ void	parse_bigpart(t_data *data)
 
 	flag = 0;
 	curr = data->cmd;
+
 	while (curr != NULL)
 	{
 		flag = 0;
 		curr->ac = replace_ds_parse(curr->ac, data, flag);
-		curr->type = check_type(curr->ac, curr);
 		curr = curr->next;
 	}
 	replace_parse(data);
 }
+
 
 int	total_path_len(char *str)
 {
@@ -382,6 +366,7 @@ char	*hs_change_exit_number(char *str, int i)
 
 	temp = NULL;
 	temp2 = NULL;
+
 	temp2 = ft_itoa(g_exit_number);
 	temp = get_full_exit(temp2, &str[i + 2]);
 	free(temp2);
@@ -398,39 +383,26 @@ char	*hs_change_full_path(char *str, t_data *data)
 	temp2 = get_path(str);
 	temp = get_full_path(temp2, data);
 	free(temp2);
+
 	return (temp);
 }
 
 int	hs_for_only_ds(char *s, int i)
 {
 	if (s[i] == '$' && ((s[i + 1] == '\0') || (s[i + 1] == '\"')
-			|| (s[i + 1] == '\'') || (s[i + 1] == ' ')))
-		return (0);
+		|| (s[i + 1] == '\'') || (s[i + 1] == ' ')))
+			return (0);
 	return (1);
-}
-
-char *hs_change_pid(char *str, int i)
-{
-	int 	j;
-	char	*temp;
-	char	*temp2;
-
-	temp = NULL;
-	temp2 = NULL;
-	j = 0;
-	j = getpid();
-	temp2 = ft_itoa(j);
-	temp = get_full_exit(temp2, &str[i + 2]);
-	free(temp2);
-	return (temp);
 }
 
 char	*replace_dollar_sign(char *st, t_data *data)
 {
 	char	*temp;
+	char	*temp2;
 	int		i;
 
 	temp = NULL;
+	temp2 = NULL;
 	i = 0;
 	while (st[i] != '\0')
 	{
@@ -438,8 +410,6 @@ char	*replace_dollar_sign(char *st, t_data *data)
 		{
 			if (st[i] == '$' && st[i + 1] == '?')
 				temp = hs_change_exit_number(&st[i], i);
-			else if (st[i] == '$' && st[i + 1] == '$')
-				temp = hs_change_pid(&st[i], i); 
 			else if (hs_for_only_ds(&st[i], i) == 0)
 			{
 				temp = malloc(sizeof(char) * (2));
@@ -488,7 +458,7 @@ int	ft_charlen_export_free(char *str)
 	}
 	free(str);
 	return (j);
-}
+} 
 
 int	before_r_ds_parse(char *str, t_data *data)
 {
@@ -519,13 +489,11 @@ int	before_r_ds_parse(char *str, t_data *data)
 	return (j);
 }
 
-int	for_replace_ds_parse(char *c, int k)
+int	for_replace_ds_parse(char *c)
 {
 	int	i;
 
-	i = k;
-	if (c[k - 1] == '$' && c[k] == '$')
-		return (0);
+	i = 0;
 	if (c[i] != '\"' && c[i] != '\'' && c[i] != '\0'
 		&& c[i] != ' ' && c[i] != '$')
 		return (0);
@@ -600,40 +568,32 @@ char	*get_full_exit(char *temp, char *str)
 	while (temp[i] != '\0')
 		temp2[j++] = temp[i++];
 	i = 0;
-	while (str[i] != '\0' && str[i] != ' ' && str[i] != '\"')
+	while (str[i] != '\0' && str[i] != ' ')
 		temp2[j++] = str[i++];
 	temp2[j] = '\0';
 	return (temp2);
 }
 
-char	*hs_change_full_path_dq(char *str, t_data *data)
-{
-	char	*temp;
-	char	*temp2;
-
-	temp = NULL;
-	temp2 = NULL;
-	temp2 = get_path(str);
-	temp = get_full_path_dq(temp2, data);
-	free(temp2);
-	return (temp);
-}
 
 char	*replace_dollar_sign_dq(char *st, t_data *data)
 {
 	char	*temp;
+	char	*temp2;
 	int		i;
 
 	temp = NULL;
+	temp2 = NULL;
 	i = 0;
 	while (st[i] != '\0')
 	{
 		if (st[i] == '$')
 		{
 			if (st[i] == '$' && st[i + 1] == '?')
-				temp = hs_change_exit_number(&st[i], i);
-			else if (st[i] == '$' && st[i + 1] == '$')
-				temp = hs_change_pid(&st[i], i); 
+			{
+				temp2 = ft_itoa(g_exit_number);
+				temp = get_full_exit(temp2, &st[i + 2]);
+				free(temp2);
+			}
 			else if (st[i] == '$' && st[i + 1] == '\0')
 			{
 				temp = malloc(sizeof(char) * (2));
@@ -641,7 +601,11 @@ char	*replace_dollar_sign_dq(char *st, t_data *data)
 				temp[1] = '\0';
 			}
 			else
-				temp = hs_change_full_path_dq(st, data);
+			{
+				temp2 = get_path(st);
+				temp = get_full_path_dq(temp2, data);
+				free(temp2);
+			}
 			return (temp);
 		}
 		i++;
@@ -682,7 +646,7 @@ void	add_i(int *i, char *str)
 
 	k = 0;
 	k++;
-	while (for_replace_ds_parse(str, k) == 0)
+	while (for_replace_ds_parse(&str[k]) == 0)
 		k++;
 	*i += k;
 }
@@ -702,9 +666,9 @@ char	*replace_ds_parse(char *str, t_data *data, int flag)
 		if (str[i] == '$' && flag != 2)
 		{
 			if (flag == 1)
-				if_replace_ds_parse(&k, &str[i], &temp[k], data);
+				if_replace_ds_parse(&k, &str[i], &temp[k], data); //$a : copy like my parsing
 			else
-				if_replace_ds_parse_dq(&k, &str[i], &temp[k], data);
+				if_replace_ds_parse_dq(&k, &str[i], &temp[k], data); //"$a" : copy everything
 			add_i(&i, &str[i]);
 		}
 		else
@@ -920,8 +884,9 @@ int	check_dq_pair(char *str)
 	return (1);
 }
 
-int	check_parse(char *ch, t_data *data)
-{
+
+int		check_parse(char *ch, t_data *data)
+ {
 	int	i;
 	int	flag;
 
@@ -939,7 +904,7 @@ int	check_parse(char *ch, t_data *data)
 	}
 	flag = check_dq_pair(ch);
 	return (flag);
-}
+ }
 
 void	increase_temp(char *temp, char *ch, int *k, int *l)
 {
@@ -1002,7 +967,7 @@ int	ft_charlen_export(char *str)
 		j++;
 	}
 	return (j);
-}
+} 
 
 int	check_dp(char *ch, int i)
 {
@@ -1023,7 +988,7 @@ int	for_bp(int flag, int i, char *ch)
 {
 	if (flag == 0 && i > 0)
 	{
-		if ((check_dp(ch, i) == 0) || (check_red(ch, i) == 0))
+		if ((check_dp(ch, i) == 0) || (check_red(ch, i) == 0) || (ch[i - 1] == '\"' && ch[i - 2] == '$'))
 			return (0);
 	}
 	return (1);
@@ -1044,7 +1009,7 @@ void	before_parse(char *ch, t_data *data)
 	{
 		flag = check_flag(flag, &ch[i]);
 		if (for_red(&ch[i], flag) == 0)
-		{
+		{ 
 			if (ch[i - 1] != ' ')
 				temp[j++] = ' ';
 			if (for_d_red(&ch[i]) == 0)
@@ -1094,6 +1059,7 @@ void	ft_set_data(t_data *data)
 	data->next = NULL;
 	data->pipe = NULL;
 }
+
 
 struct s_data	*clean_all(t_data *data)
 {
