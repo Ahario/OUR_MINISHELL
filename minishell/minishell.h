@@ -73,7 +73,7 @@ void	exit_c_d(void);
 void	error_message(char *str, char *des);
 void	ft_exit(t_data *data);
 int	exitcheck(t_arg *head);
-void	exit2(void);
+void	exit2(int flag);
 //env
 void	ft_env(char **envp);
 void	ft_export(t_data *data);

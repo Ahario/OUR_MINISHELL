@@ -6,16 +6,17 @@
 /*   By: sunglee <sunglee@student.42seoul.kr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/30 14:05:56 by sunglee           #+#    #+#             */
-/*   Updated: 2022/09/25 17:54:07 by lee-sung         ###   ########.fr       */
+/*   Updated: 2022/09/27 12:36:40 by sunglee          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "libft/libft.h"
 #include "minishell.h"
 #include <readline/history.h>
 
-void	exit2(void)
+void	exit2(int flag)
 {
-	printf("exit\n");
+	if (!flag)
+		printf("exit\n");
 	exit(EXIT_SUCCESS);
 }
 
@@ -42,14 +43,14 @@ void	error_message(char *str, char *des)
 		ft_putstr_fd(str, 2);
 	if (des)
 	{
-		ft_putstr_fd("'", 2);
+		ft_putstr_fd("`", 2);
 		ft_putstr_fd(des, 2);
 		ft_putstr_fd("'", 2);
 	}
 	g_exit_number = 127;
 }
 
-int	ft_atoi_exit(char *str, int i)
+int	ft_atoi_exit(char *str, int i, int flag)
 {
 	int					sign;
 	unsigned long long	ret;
@@ -68,17 +69,19 @@ int	ft_atoi_exit(char *str, int i)
 	if ((ret > 9223372036854775807u && sign == 1) \
 			|| (ret > 9223372036854775808u && sign == -1))
 	{
-		ft_putstr_fd("exit\n", 1);
+		if(!flag)
+			ft_putstr_fd("exit\n", 1);
 		error_message("exit: ", NULL);
 		ft_putstr_fd("numeric argument required\n", 2);
 		g_exit_number = 255;
 		exit(255);
 	}
-	ft_putstr_fd("exit\n", 1);
+	if(!flag)
+		ft_putstr_fd("exit\n", 1);
 	return (sign * ret);
 }
 
-static void	exit_numeric_check(char *str)
+static void	exit_numeric_check(char *str, int flag)
 {
 	int	j;
 
@@ -93,7 +96,8 @@ static void	exit_numeric_check(char *str)
 		j++;
 	if (j != (int)ft_strlen(str))
 	{
-		printf("exit\n");
+		if(!flag)
+			printf("exit\n");
 		error_message("exit: ", NULL);
 		ft_putstr_fd("numeric argument required\n", 2);
 		g_exit_number = 255;
@@ -105,16 +109,20 @@ void	ft_exit(t_data *data)
 {
 	int		t_cnt;
 	char	*str;
+	int		flag;
 	t_arg	*head;
 
+	flag = 0;
+	if (data->pipe)
+		flag = 1;
 	head = data->cmd;
 	t_cnt = count_total(head);
 	if (t_cnt > 1 && t_cnt < 3)
 	{
 		head = head->next;
 		str = head->ac;
-		exit_numeric_check(str);
-		exit(ft_atoi_exit(head->ac, 0));
+		exit_numeric_check(str, flag);
+		exit(ft_atoi_exit(head->ac, 0, flag));
 	}
 	if (t_cnt >= 3)
 	{
@@ -123,7 +131,7 @@ void	ft_exit(t_data *data)
 		g_exit_number = 1;
 	}
 	else
-		exit2();
+		exit2(flag);
 }
 
 void	exit_c_d(void)
