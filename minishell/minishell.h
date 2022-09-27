@@ -106,4 +106,6 @@ void	ft_here_doc(t_data *data, char *str, int *i, char *stop);
 //pipe
 struct s_data	*ft_pipe_list(t_data *data);
 void	ft_pipe_cmd(t_data *data);
+int		is_ws(char *str);
+
 #endif

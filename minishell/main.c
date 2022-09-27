@@ -885,7 +885,7 @@ int		check_parse(char *ch, t_data *data)
 	(void)data;
  	while (ch[i] != '\0')
  	{
- 		if (ch[i] != ' ')
+ 		if (is_ws(&ch[i]) == 0)
  		{
  			flag = 1;
  			break;
@@ -907,6 +907,16 @@ void	increase_temp(char *temp, char *ch, int *k, int *l)
 	temp[j++] = ch[i++];
 	*l += 2;
 	*k += 2;
+}
+
+int	is_ws(char *str)
+{
+	int i;
+
+	i = 0;
+	if ((str[i] >= 9 && str[i] <= 13) || str[i] == ' ')
+		return (0);
+	return (1);
 }
 
 int	for_red(char *c, int f)
@@ -949,6 +959,31 @@ int	ft_charlen_export(char *str)
 	return (j);
 } 
 
+int check_dp(char *ch, int i)
+{
+	if (ch[i - 1] == '|' && ch[i] != ' ' && ch[i] != '|')
+		return (0);
+	return (1);
+}
+
+int check_red(char *ch, int i)
+{
+	if ((ch[i - 1] == '<' && ch[i] != ' ')
+		|| (ch[i - 1] == '>' && ch[i] != ' '))
+		return (0);
+	return (1);		
+}
+
+int for_bp(int flag, int i, char *ch)
+{
+	if (flag == 0 && i > 0)
+	{
+		if ((check_dp(ch, i) == 0) || (check_red(ch, i) == 0))
+			return (0);
+	}
+	return (1);
+}
+
 void	before_parse(char *ch, t_data *data)
 {
 	int		i;
@@ -971,8 +1006,7 @@ void	before_parse(char *ch, t_data *data)
 				increase_temp(&temp[j], &ch[i], &i, &j);
 		}
 		temp[j++] = ch[i++];
-		if (flag == 0 && i > 0 && ((ch[i - 1] == '|' && ch[i] != ' ' && ch[i] != '|')
-			|| (ch[i - 1] == '<' && ch[i] != ' ') || (ch[i - 1] == '>' && ch[i] != ' ')))
+		if (for_bp(flag, i, ch) == 0)
 			temp[j++] = ' ';
 	}
 	temp[j] = '\0';
@@ -992,7 +1026,7 @@ void	parse(char *ch, t_data *data)
 		if ((ch[i] != '\'' && ch[i] != '\"')
 			|| (ch[i] == '\"' || ch[i] == '\''))
 		{
-			while (ch[i] == ' ')
+			while (is_ws(&ch[i]) == 0)
 				i++;
 			if (ch[i] != '\0')
 			{
@@ -1127,7 +1161,6 @@ int	main(int argc, char *argv[], char **envp)
 	char			*ch;
 
 	tcgetattr(STDIN_FILENO, &terminal);
-	tcsetattr(STDIN_FILENO, TCSANOW, &terminal);
 	data = ft_before(argc, argv, envp);
 	while (1)
 	{
@@ -1138,9 +1171,7 @@ int	main(int argc, char *argv[], char **envp)
 			{
 				before_parse(ch, data);
 				if(!ft_redir(data))
-				{
 					ft_cmd_start(data);
-				}
 			}
 		}
 		else if (!ch)
@@ -1149,5 +1180,6 @@ int	main(int argc, char *argv[], char **envp)
 		data = clean_all(data);
 		free(ch);
 	}
+	tcsetattr(STDIN_FILENO, TCSANOW, &terminal);
 	return (0);
 }
